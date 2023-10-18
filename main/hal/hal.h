@@ -36,6 +36,8 @@ namespace HAL
             m5::Speaker_Class* _speaker;
             Button* _homeButton;
 
+            bool _sntp_adjusted;
+
         public:
             Hal() : 
             _display(nullptr), 
@@ -45,7 +47,8 @@ namespace HAL
             _keyboard(nullptr),
             _mic(nullptr),
             _speaker(nullptr),
-            _homeButton(nullptr)
+            _homeButton(nullptr),
+            _sntp_adjusted(false)
             {}
 
             // Getter 
@@ -57,6 +60,11 @@ namespace HAL
             inline m5::Mic_Class* mic() { return _mic; }
             inline m5::Speaker_Class* Speaker() { return _speaker; }
             inline Button* homeButton() { return _homeButton; }
+
+            inline void setSntpAdjusted(bool isAdjusted) { _sntp_adjusted = isAdjusted; }
+            inline bool isSntpAdjusted(void) { return _sntp_adjusted; }
+
+
             
             // Canvas 
             inline void canvas_system_bar_update() { _canvas_system_bar->pushSprite(_canvas_keyboard_bar->width(), 0); }

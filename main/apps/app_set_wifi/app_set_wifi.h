@@ -34,7 +34,7 @@ namespace MOONCAKE
 
             public:
                 void onCreate() override;
-                void onResume() override { ANIM_APP_OPEN(); }
+                void onResume() override;
                 void onRunning() override;
         };
 
