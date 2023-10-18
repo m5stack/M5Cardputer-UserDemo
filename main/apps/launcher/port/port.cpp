@@ -239,12 +239,26 @@ void Launcher::_port_update_system_state()
     // _data.system_state.bat_state = 2;
     // _data.system_state.time = "22:33";
 
-    // Fake time 
-    snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", millis() / 3600000, millis() / 60000);
+
+
+    // Time shit 
+    if (_data.hal->isSntpAdjusted())
+    {
+        static time_t now;
+        static struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+
+        // spdlog::info("{} {}", timeinfo.tm_hour, timeinfo.tm_min);
+        snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+    }
+    else 
+    {
+        // Fake time 
+        snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", millis() / 3600000, millis() / 60000);
+    }
     _data.system_state.time = _data.string_buffer;
-
-
-
+    // spdlog::info("time: {}", _data.system_state.time);
 
 
     

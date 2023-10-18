@@ -2,7 +2,7 @@
  * @file theme_define.h
  * @author Forairaaaaa
  * @brief 
- * @version 0.1
+ * @version 0.6
  * @date 2023-09-20
  * 
  * @copyright Copyright (c) 2023
@@ -37,4 +37,5 @@
 #define FONT_SIZE_REPL                      1
 // #define FONT_REPL_WIDTH                     _canvas->fontWidth()
 #define FONT_REPL_WIDTH                     8
+#define FONT_REPL_HEIGHT                    16
 

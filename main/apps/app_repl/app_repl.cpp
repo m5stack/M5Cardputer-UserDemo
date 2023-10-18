@@ -2,7 +2,7 @@
  * @file app_repl.cpp
  * @author Forairaaaaa
  * @brief 
- * @version 0.1
+ * @version 0.6
  * @date 2023-09-20
  * 
  * @copyright Copyright (c) 2023
@@ -105,15 +105,15 @@ void AppREPL::_update_input()
                     int cursor_x = _canvas->getCursorX();
                     int cursor_y = _canvas->getCursorY();
 
-                    if (cursor_x - _canvas->fontWidth() < 0)
+                    if (cursor_x - FONT_REPL_WIDTH < 0)
                     {
                         // Last line 
-                        cursor_y -= _canvas->fontHeight();
-                        cursor_x = _canvas->width() - _canvas->fontWidth();
+                        cursor_y -= FONT_REPL_HEIGHT;
+                        cursor_x = _canvas->width() - FONT_REPL_WIDTH;
                     }
                     else 
                     {
-                        cursor_x -= _canvas->fontWidth();
+                        cursor_x -= FONT_REPL_WIDTH;
                     }
 
                     spdlog::info("new cursor {} {}", cursor_x, cursor_y);

@@ -2,7 +2,7 @@
  * @file cardputer.cpp
  * @author Forairaaaaa
  * @brief 
- * @version 0.1
+ * @version 0.6
  * @date 2023-10-12
  * 
  * @copyright Copyright (c) 2023
@@ -22,11 +22,11 @@ HalCardputer hal;
 Mooncake mooncake;
 
 
-void _data_base_setup_callback(SIMPLEKV::SimpleKV &db) 
+void _data_base_setup_callback(SIMPLEKV::SimpleKV& db) 
 {
     // DI
-    db.Add<HAL::Hal *>("HAL", &hal);
-    spdlog::info("hal injection: {}", db.Get("HAL")->value<HAL::Hal *>()->type());
+    db.Add<HAL::Hal*>("HAL", &hal);
+    spdlog::info("hal injection: {}", db.Get("HAL")->value<HAL::Hal*>()->type());
 }
 
 
@@ -39,14 +39,16 @@ extern "C" void app_main(void)
     hal.init();
 
 
-
+    // ------------------------------------------------------------------ //
     #ifdef ON_HAL_TEST
         spdlog::info("on hal test");
 
         // HalCardputer::MicTest(&hal);
         HalCardputer::SpeakerTest(&hal);
+    // ------------------------------------------------------------------ //
 
 
+    // ------------------------------------------------------------------ //
     #elif ON_APP_TEST
         mooncake.setDatabaseSetupCallback(_data_base_setup_callback);
         mooncake.init();
@@ -64,6 +66,10 @@ extern "C" void app_main(void)
         mooncake.startApp(mooncake.createApp(test_app));
         while (1)
             mooncake.update();
+    // ------------------------------------------------------------------ //
+
+
+    // ------------------------------------------------------------------ //
     #elif ON_APP_TEST_WITH_LAUNCHER
         // Init framework 
         mooncake.setDatabaseSetupCallback(_data_base_setup_callback);
@@ -73,19 +79,22 @@ extern "C" void app_main(void)
         auto launcher = new APPS::Launcher_Packer;
         mooncake.installApp(launcher);
 
-
         // mooncake.installApp(new APPS::AppREPL_Packer);
         mooncake.installApp(new APPS::AppChat_Packer);
         // mooncake.installApp(new APPS::AppRecord_Packer);
         mooncake.installApp(new APPS::AppWifiScan_Packer);
+        mooncake.installApp(new APPS::AppSetWiFi_Packer);
 
         // Create launcher 
         mooncake.createApp(launcher);
         while (1)
             mooncake.update();
     #else
+    // ------------------------------------------------------------------ //
 
 
+
+    // ------------------------------------------------------------------ //
     // Init framework 
     mooncake.setDatabaseSetupCallback(_data_base_setup_callback);
     mooncake.init();
@@ -100,7 +109,7 @@ extern "C" void app_main(void)
     mooncake.installApp(new APPS::AppChat_Packer);
     mooncake.installApp(new APPS::AppIR_Packer);
     mooncake.installApp(new APPS::AppREPL_Packer);
-    // mooncake.installApp(new APPS::AppSetWiFi_Packer);
+    mooncake.installApp(new APPS::AppSetWiFi_Packer);
     mooncake.installApp(new APPS::AppTimer_Packer);
 
     // Create launcher 
@@ -109,6 +118,7 @@ extern "C" void app_main(void)
     // Update framework 
     while (1)
         mooncake.update();
+    // ------------------------------------------------------------------ //
 
     #endif
 }
