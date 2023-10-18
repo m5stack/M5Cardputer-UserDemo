@@ -120,6 +120,8 @@ void AppSetWiFi::_update_cursor()
         int cursor_x = _canvas->getCursorX();
         int cursor_y = _canvas->getCursorY();
 
+        // spdlog::info("cursor {} {}", cursor_x, cursor_y);
+
         _canvas->print(_data.cursor_state ? '_' : ' ');
         _canvas->setCursor(cursor_x, cursor_y);
         _canvas_update();
@@ -164,21 +166,40 @@ void AppSetWiFi::_update_state()
     if (_data.current_state == state_connect)
     {
         _canvas->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
-        _canvas->printf("WiFi config:\n- %s\n- %s\nConnecting...", _data.wifi_ssid.c_str(), _data.wifi_password.c_str());
+        _canvas->printf("WiFi config:\n- %s\n- %s\nConnecting...\n", _data.wifi_ssid.c_str(), _data.wifi_password.c_str());
         _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
         _canvas_update();
 
 
         wifi_connect_wrap_config(_data.wifi_ssid.c_str(), _data.wifi_password.c_str());
+        wifi_connect_wrap_connect();
 
-        // wifi_connect_wrap_config("M5-R&D", "echo\"password\">/dev/null");
-        // // wifi_connect_wrap_connect();
+        if (wifi_connect_wrap_is_wifi_connect_success() != 0)
+        {
+            _canvas->setTextColor(TFT_GREENYELLOW, THEME_COLOR_BG);
+            _canvas->printf("Connected\nSNTP init...");
+            _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+            _canvas_update();
 
-        sntp_warp_init();
-        
-        _data.hal->setSntpAdjusted(true);
+            sntp_warp_init();
+            _data.hal->setSntpAdjusted(true);
 
-        destroyApp();
+            _canvas->setTextColor(TFT_GREENYELLOW, THEME_COLOR_BG);
+            _canvas->printf("Done");
+            _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+            _canvas_update();
+        }
+        else 
+        {
+            _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
+            _canvas->printf("Failed");
+            _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+            _canvas_update();
+        }
+
+        wifi_connect_wrap_disconnect();
+
+        _data.current_state = state_wait_quit;
     }
 }
 
@@ -188,7 +209,7 @@ void AppSetWiFi::onCreate()
     spdlog::info("{} onCreate", getAppName());
 
     // Get hal
-    _data.hal = mcAppGetDatabase()->Get("HAL")->value<HAL::Hal *>();
+    _data.hal = mcAppGetDatabase()->Get("HAL")->value<HAL::Hal*>();
 }
 
 
@@ -211,8 +232,16 @@ void AppSetWiFi::onResume()
 
 void AppSetWiFi::onRunning()
 {
-    _update_input();
+    if (_data.current_state != state_wait_quit)
+        _update_input();
     _update_cursor();
+
+    if (_data.hal->homeButton()->pressed())
+    {
+        _data.hal->playNextSound();
+        spdlog::info("quit set wifi");
+        destroyApp();
+    }
 }
 
 

@@ -148,7 +148,7 @@ static void obtain_time(void)
      * examples/protocols/README.md for more information about this function.
      */
     // ESP_ERROR_CHECK(example_connect());
-    wifi_connect_wrap_connect();
+    // wifi_connect_wrap_connect();
 
     initialize_sntp();
 
@@ -165,7 +165,7 @@ static void obtain_time(void)
     localtime_r(&now, &timeinfo);
 
     // ESP_ERROR_CHECK( example_disconnect() );
-    wifi_connect_wrap_disconnect();
+    // wifi_connect_wrap_disconnect();
 }
 
 static void initialize_sntp(void)

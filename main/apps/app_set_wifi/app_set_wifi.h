@@ -32,6 +32,7 @@ namespace MOONCAKE
                     state_wait_ssid,
                     state_wait_password,
                     state_connect,
+                    state_wait_quit,
                 };
 
                 struct Data_t

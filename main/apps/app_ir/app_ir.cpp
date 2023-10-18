@@ -34,6 +34,7 @@ void AppIR::onCreate()
     _data.hal->canvas()->setFont(FONT_REPL);
     _data.hal->canvas()->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
     _data.hal->canvas()->setTextSize(1);
+    _data.hal->canvas()->setTextScroll(false);
     ir_wrap_init();
 }
 
