@@ -37,4 +37,5 @@
 #define FONT_SIZE_REPL                      1
 // #define FONT_REPL_WIDTH                     _canvas->fontWidth()
 #define FONT_REPL_WIDTH                     8
+#define FONT_REPL_HEIGHT                    16
 

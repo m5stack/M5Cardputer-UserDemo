@@ -13,10 +13,13 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
 
 void wifi_connect_wrap_config(const char* ssid, const char* password);
+void wifi_connect_get_config();
 void wifi_connect_wrap_connect();
 void wifi_connect_wrap_disconnect();
+uint8_t wifi_connect_wrap_is_wifi_connect_success();
 
 
 #ifdef __cplusplus

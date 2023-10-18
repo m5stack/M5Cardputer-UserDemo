@@ -249,8 +249,7 @@ void Launcher::_port_update_system_state()
         time(&now);
         localtime_r(&now, &timeinfo);
 
-        spdlog::info("{} {}", timeinfo.tm_hour, timeinfo.tm_min);
-
+        // spdlog::info("{} {}", timeinfo.tm_hour, timeinfo.tm_min);
         snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
     }
     else 
@@ -259,7 +258,7 @@ void Launcher::_port_update_system_state()
         snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", millis() / 3600000, millis() / 60000);
     }
     _data.system_state.time = _data.string_buffer;
-    spdlog::info("time: {}", _data.system_state.time);
+    // spdlog::info("time: {}", _data.system_state.time);
 
 
     

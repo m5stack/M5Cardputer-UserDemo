@@ -13,6 +13,8 @@
 
 static char _wifi_ssid[50] = {0};
 static char _wifi_password[50] = {0};
+static uint8_t _is_wifi_connect_success = 0;
+static uint8_t _connect_retry_count = 0;
 
 #define CONFIG_EXAMPLE_WIFI_AUTH_OPEN               1
 #define CONFIG_EXAMPLE_CONNECT_WIFI                 1
@@ -241,6 +243,19 @@ esp_err_t example_connect(void)
     for (int i = 0; i < NR_OF_IP_ADDRESSES_TO_WAIT_FOR; ++i) {
         xSemaphoreTake(s_semph_get_ip_addrs, portMAX_DELAY);
     }
+
+
+    if (_connect_retry_count > 5)
+    {
+        _is_wifi_connect_success = 0;
+        return ESP_FAIL;
+    }
+    else 
+    {
+        _is_wifi_connect_success = 1;
+    }
+
+
     // iterate over active interfaces, and print out IPs of "our" netifs
     esp_netif_t *netif = NULL;
     esp_netif_ip_info_t ip;
@@ -282,6 +297,15 @@ esp_err_t example_disconnect(void)
 static void on_wifi_disconnect(void *arg, esp_event_base_t event_base,
                                int32_t event_id, void *event_data)
 {
+    _connect_retry_count++;
+    if (_connect_retry_count > 5)
+    {
+        ESP_LOGI(TAG, "hit retry limit, connect failed");
+        xSemaphoreGive(s_semph_get_ip_addrs);
+        return;
+    }
+
+
     ESP_LOGI(TAG, "Wi-Fi disconnected, trying to reconnect...");
     esp_err_t err = esp_wifi_connect();
     if (err == ESP_ERR_WIFI_NOT_STARTED) {
@@ -323,7 +347,7 @@ static esp_netif_t *wifi_start(void)
     ESP_ERROR_CHECK(esp_event_handler_register(IP_EVENT, IP_EVENT_GOT_IP6, &on_got_ipv6, NULL));
 #endif
 
-    ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    // ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = CONFIG_EXAMPLE_WIFI_SSID,
@@ -571,5 +595,22 @@ void wifi_connect_wrap_connect()
 void wifi_connect_wrap_disconnect()
 {
     example_disconnect();
+}
+
+
+void wifi_connect_get_config()
+{
+    // ESP_ERROR_CHECK(nvs_flash_init());
+
+    wifi_config_t config;
+    esp_wifi_get_config(WIFI_IF_STA, &config);
+
+    printf("get config:\nssid: %s\npassword: %s\n", config.sta.ssid, config.sta.password);
+}
+
+
+uint8_t wifi_connect_wrap_is_wifi_connect_success()
+{
+    return _is_wifi_connect_success;
 }
 
