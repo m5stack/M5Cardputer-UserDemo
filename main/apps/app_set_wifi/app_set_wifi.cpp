@@ -2,7 +2,7 @@
  * @file app_set_wifi.cpp
  * @author Forairaaaaa
  * @brief 
- * @version 0.1
+ * @version 0.6
  * @date 2023-09-20
  * 
  * @copyright Copyright (c) 2023

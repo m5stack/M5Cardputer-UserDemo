@@ -2,7 +2,7 @@
  * @file wifi_connect_wrap.c
  * @author Forairaaaaa
  * @brief 
- * @version 0.1
+ * @version 0.6
  * @date 2023-10-18
  * 
  * @copyright Copyright (c) 2023
