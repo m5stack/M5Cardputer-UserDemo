@@ -53,6 +53,7 @@ namespace MOONCAKE
                     std::string wifi_password;
                 };
                 Data_t _data;
+                
                 void _update_input();
                 void _update_cursor();
                 void _update_state();
