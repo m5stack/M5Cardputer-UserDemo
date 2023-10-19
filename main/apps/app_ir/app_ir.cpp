@@ -1,7 +1,7 @@
 /**
  * @file app_ir.cpp
  * @author Forairaaaaa
- * @brief http://gitlab.m5stack.com/Forairaaaaa/stamps3_keypad_factory_test/blob/master/code/src/factory_test/ir/ir_test.cpp
+ * @brief 
  * @version 0.6
  * @date 2023-09-20
  * 
