@@ -71,6 +71,7 @@ class LGFX_Cardputer : public lgfx::LGFX_Device {
             cfg.invert = false;           // バックライトの輝度を反転させる場合 true
             // cfg.freq   = 44100;           // バックライトのPWM周波数
             cfg.freq   = 200;           // バックライトのPWM周波数
+            // cfg.freq   = 500;           // バックライトのPWM周波数
             cfg.pwm_channel = 7;          // 使用するPWMのチャンネル番号
 
             _light_instance.config(cfg);

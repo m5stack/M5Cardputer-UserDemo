@@ -32,7 +32,7 @@ void _data_base_setup_callback(SIMPLEKV::SimpleKV& db)
 
 // #define ON_HAL_TEST
 // #define ON_APP_TEST 1
-// #define ON_APP_TEST_WITH_LAUNCHER 1
+#define ON_APP_TEST_WITH_LAUNCHER 1
 extern "C" void app_main(void)
 {
     // Init hal 
@@ -44,7 +44,9 @@ extern "C" void app_main(void)
         spdlog::info("on hal test");
 
         // HalCardputer::MicTest(&hal);
-        HalCardputer::SpeakerTest(&hal);
+        // HalCardputer::SpeakerTest(&hal);
+
+        HalCardputer::LcdBgLightTest(&hal);
     // ------------------------------------------------------------------ //
 
 
