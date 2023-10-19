@@ -25,7 +25,6 @@ static uint8_t _connect_retry_count = 0;
 #define CONFIG_EXAMPLE_WIFI_SCAN_RSSI_THRESHOLD     -127
 
 
-
 /* Common functions for protocol examples, to establish Wi-Fi or Ethernet connection.
 
    This example code is in the Public Domain (or CC0 licensed, at your option.)
@@ -348,6 +347,8 @@ static esp_netif_t *wifi_start(void)
 #endif
 
     // ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_RAM));
+    // ESP_ERROR_CHECK(esp_wifi_set_storage(WIFI_STORAGE_FLASH));
+
     wifi_config_t wifi_config = {
         .sta = {
             .ssid = CONFIG_EXAMPLE_WIFI_SSID,
@@ -600,12 +601,12 @@ void wifi_connect_wrap_disconnect()
 
 void wifi_connect_get_config()
 {
-    // ESP_ERROR_CHECK(nvs_flash_init());
+    ESP_ERROR_CHECK(nvs_flash_init());
 
     wifi_config_t config;
     esp_wifi_get_config(WIFI_IF_STA, &config);
 
-    printf("get config:\nssid: %s\npassword: %s\n", config.sta.ssid, config.sta.password);
+    printf("get config:\nssid: %s\npassword: %s\n", (char*)config.sta.ssid, (char*)config.sta.password);
 }
 
 

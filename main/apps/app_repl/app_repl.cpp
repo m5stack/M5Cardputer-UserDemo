@@ -73,7 +73,7 @@ void AppREPL::_update_input()
                     return;
                 }
 
-                // New line 
+                // New line (little space at front is to cover the cursor)
                 _canvas->print(" \n");
 
                 // Run cmd 

@@ -139,9 +139,12 @@ void AppSetWiFi::_update_state()
         _canvas->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
         _canvas->printf("WiFi SSID:\n");
         _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+        _canvas->printf(">>> ");
         _canvas_update();
         
         _data.current_state = state_wait_ssid;
+
+        // wifi_connect_get_config();
     }
 
     else if (_data.current_state == state_wait_ssid)
@@ -149,6 +152,7 @@ void AppSetWiFi::_update_state()
         _canvas->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
         _canvas->printf("WiFi Password:\n");
         _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+        _canvas->printf(">>> ");
         _canvas_update();
 
         _data.wifi_ssid = _data.repl_input_buffer;
@@ -177,7 +181,7 @@ void AppSetWiFi::_update_state()
         if (wifi_connect_wrap_is_wifi_connect_success() != 0)
         {
             _canvas->setTextColor(TFT_GREENYELLOW, THEME_COLOR_BG);
-            _canvas->printf("Connected\nSNTP init...");
+            _canvas->printf("Connected\nSNTP adjusting...\n");
             _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
             _canvas_update();
 
@@ -185,15 +189,17 @@ void AppSetWiFi::_update_state()
             _data.hal->setSntpAdjusted(true);
 
             _canvas->setTextColor(TFT_GREENYELLOW, THEME_COLOR_BG);
-            _canvas->printf("Done");
+            _canvas->printf("Done\n");
             _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+            _canvas->printf(">>> ");
             _canvas_update();
         }
         else 
         {
             _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-            _canvas->printf("Failed");
+            _canvas->printf("Failed\n");
             _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+            _canvas->printf(">>> ");
             _canvas_update();
         }
 
