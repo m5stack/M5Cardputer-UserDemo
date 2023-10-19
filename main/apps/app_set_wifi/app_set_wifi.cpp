@@ -40,7 +40,7 @@ void AppSetWiFi::_update_input()
             if (_keyboard->keysState().enter)
             {
                 // New line 
-                _canvas->print(" \n>>> ");
+                _canvas->print(" \n");
 
                 _update_state();
 
@@ -139,6 +139,7 @@ void AppSetWiFi::_update_state()
         _canvas->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
         _canvas->printf("WiFi SSID:\n");
         _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+        _canvas->printf(">>> ");
         _canvas_update();
         
         _data.current_state = state_wait_ssid;
@@ -151,6 +152,7 @@ void AppSetWiFi::_update_state()
         _canvas->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
         _canvas->printf("WiFi Password:\n");
         _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
+        _canvas->printf(">>> ");
         _canvas_update();
 
         _data.wifi_ssid = _data.repl_input_buffer;

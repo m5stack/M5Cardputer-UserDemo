@@ -32,7 +32,7 @@ void _data_base_setup_callback(SIMPLEKV::SimpleKV& db)
 
 // #define ON_HAL_TEST
 // #define ON_APP_TEST 1
-#define ON_APP_TEST_WITH_LAUNCHER 1
+// #define ON_APP_TEST_WITH_LAUNCHER 1
 extern "C" void app_main(void)
 {
     // Init hal 
@@ -83,7 +83,7 @@ extern "C" void app_main(void)
         // mooncake.installApp(new APPS::AppChat_Packer);
         // mooncake.installApp(new APPS::AppRecord_Packer);
         // mooncake.installApp(new APPS::AppWifiScan_Packer);
-        // mooncake.installApp(new APPS::AppSetWiFi_Packer);
+        mooncake.installApp(new APPS::AppSetWiFi_Packer);
         mooncake.installApp(new APPS::AppIR_Packer);
 
         // Create launcher 

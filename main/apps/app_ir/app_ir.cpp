@@ -158,6 +158,7 @@ void AppIR::_update_state()
         
         if (_data.parse_result.size() >= 2)
         {
+            // https://docs.espressif.com/projects/esp-idf/zh_CN/v4.4.6/esp32/api-guides/error-handling.html
             try
             {
                 ir_addr = std::stoi(_data.parse_result[0]);
@@ -195,12 +196,16 @@ void AppIR::_update_state()
 
 
 
-        // New line 
-        _canvas->print(">>> ");
-        _canvas_update();
+        // // New line 
+        // _canvas->print(">>> ");
+        // _canvas_update();
+        // // Reset buffer
+        // _data.repl_input_buffer = "";
 
-        // Reset buffer
-        _data.repl_input_buffer = "";
+
+        // Keep that shit still 
+        _canvas->printf(">>> %s", _data.repl_input_buffer.c_str());
+        _canvas_update();
 
         _data.current_state = state_wait_input;
     }
