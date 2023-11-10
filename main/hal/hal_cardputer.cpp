@@ -197,4 +197,34 @@ void HalCardputer::SpeakerTest(HalCardputer* hal)
         delay(1000);
 
     }
+
+}
+
+
+void HalCardputer::LcdBgLightTest(HalCardputer* hal)
+{
+    hal->display()->setTextSize(3);
+
+    std::vector<int> color_list = {TFT_RED, TFT_GREEN, TFT_BLUE};
+    for (auto i : color_list)
+    {
+        hal->display()->fillScreen(i);
+
+        for (int i = 0; i < 256; i++)
+        {
+            hal->display()->setCursor(0, 0);
+            hal->display()->printf("%d", i);
+            hal->display()->setBrightness(i);
+            delay(20);
+        }
+        delay(1000);
+
+        for (int i = 255; i >= 0; i--)
+        {
+            hal->display()->setCursor(0, 0);
+            hal->display()->printf("%d", i);
+            hal->display()->setBrightness(i);
+            delay(20);
+        }
+    }
 }

@@ -33,5 +33,6 @@ namespace HAL
         public:
             static void MicTest(HalCardputer* hal);
             static void SpeakerTest(HalCardputer* hal);
+            static void LcdBgLightTest(HalCardputer* hal);
     };
 }

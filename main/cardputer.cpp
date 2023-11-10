@@ -44,7 +44,9 @@ extern "C" void app_main(void)
         spdlog::info("on hal test");
 
         // HalCardputer::MicTest(&hal);
-        HalCardputer::SpeakerTest(&hal);
+        // HalCardputer::SpeakerTest(&hal);
+
+        HalCardputer::LcdBgLightTest(&hal);
     // ------------------------------------------------------------------ //
 
 
