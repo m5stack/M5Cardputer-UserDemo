@@ -292,3 +292,12 @@ void Keyboard::updateKeysState()
 }
 
 
+bool Keyboard::isChanged() 
+{
+    if (_last_key_size != _key_list_buffer.size()) 
+    {
+        _last_key_size = _key_list_buffer.size();
+        return true;
+    } 
+    return false;
+}

@@ -12,6 +12,7 @@
 #include "spdlog/spdlog.h"
 #include "../utils/wifi_common_test/wifi_common_test.h"
 #include "../utils/theme/theme_define.h"
+#include "../utils/ble_keyboard_wrap/ble_keyboard_wrap.h"
 
 
 using namespace MOONCAKE::APPS;
@@ -38,6 +39,15 @@ void AppKeyboard::onResume()
     _data.hal->canvas_update();
 
 
+    // Start ble keyboard 
+    ble_keyboard_wrap_init(_data.hal->keyboard());
+
+
+    // _data.hal->canvas()->deleteSprite();
+    // while (1)
+    // {
+    //     delay(1000);
+    // }
 }
 
 

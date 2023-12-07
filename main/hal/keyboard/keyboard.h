@@ -154,6 +154,7 @@ namespace KEYBOARD
             KeysState _keys_state_buffer;
 
             bool _is_caps_locked;
+            uint8_t _last_key_size;
 
 
             void _set_output(const std::vector<int>& pinList, uint8_t output);
@@ -162,7 +163,8 @@ namespace KEYBOARD
 
         public:
             Keyboard() : 
-                _is_caps_locked(false)
+                _is_caps_locked(false),
+                _last_key_size(0)
                 {}
 
             void init();
@@ -183,5 +185,8 @@ namespace KEYBOARD
 
             inline bool capslocked(void) { return _is_caps_locked; }
             inline void setCapsLocked(bool isLocked) { _is_caps_locked = isLocked; }
+
+            bool isChanged();
+            inline uint8_t isPressed() { return _key_list_buffer.size(); }
     };
 }
