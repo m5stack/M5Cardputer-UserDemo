@@ -279,9 +279,15 @@ void Keyboard::updateKeysState()
     for (auto& i : _key_values_without_special_keys)
     {
         if (_keys_state_buffer.ctrl || _keys_state_buffer.shift || _is_caps_locked)
+        {
             _keys_state_buffer.values.push_back(*getKeyValue(i).value_second);
+            _keys_state_buffer.hidKey.push_back(getKeyValue(i).value_num_second);
+        }
         else
+        {
             _keys_state_buffer.values.push_back(*getKeyValue(i).value_first);
+            _keys_state_buffer.hidKey.push_back(getKeyValue(i).value_num_first);
+        }
     }
 }
 
