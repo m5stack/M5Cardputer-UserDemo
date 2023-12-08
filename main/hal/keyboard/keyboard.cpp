@@ -257,18 +257,21 @@ void Keyboard::updateKeysState()
         if (strcmp(getKeyValue(i).value_first, "del") == 0)
         {
             _keys_state_buffer.del = true;
+            _keys_state_buffer.hidKey.push_back(KEY_BACKSPACE);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "enter") == 0)
         {
             _keys_state_buffer.enter = true;
+            _keys_state_buffer.hidKey.push_back(KEY_ENTER);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "space") == 0)
         {
             _keys_state_buffer.space = true;
+            _keys_state_buffer.hidKey.push_back(KEY_SPACE);
             continue;
         } 
 
@@ -279,10 +282,25 @@ void Keyboard::updateKeysState()
     for (auto& i : _key_values_without_special_keys)
     {
         if (_keys_state_buffer.ctrl || _keys_state_buffer.shift || _is_caps_locked)
+        {
             _keys_state_buffer.values.push_back(*getKeyValue(i).value_second);
+            _keys_state_buffer.hidKey.push_back(getKeyValue(i).value_num_second);
+        }
         else
+        {
             _keys_state_buffer.values.push_back(*getKeyValue(i).value_first);
+            _keys_state_buffer.hidKey.push_back(getKeyValue(i).value_num_first);
+        }
     }
 }
 
 
+bool Keyboard::isChanged() 
+{
+    if (_last_key_size != _key_list_buffer.size()) 
+    {
+        _last_key_size = _key_list_buffer.size();
+        return true;
+    } 
+    return false;
+}

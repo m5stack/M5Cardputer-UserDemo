@@ -17,4 +17,4 @@
 #include "app_repl/app_repl.h"
 #include "app_set_wifi/app_set_wifi.h"
 #include "app_timer/app_timer.h"
-
+#include "app_keyboard/app_keyboard.h"
