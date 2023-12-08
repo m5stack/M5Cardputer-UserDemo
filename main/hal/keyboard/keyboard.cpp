@@ -257,18 +257,21 @@ void Keyboard::updateKeysState()
         if (strcmp(getKeyValue(i).value_first, "del") == 0)
         {
             _keys_state_buffer.del = true;
+            _keys_state_buffer.hidKey.push_back(KEY_BACKSPACE);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "enter") == 0)
         {
             _keys_state_buffer.enter = true;
+            _keys_state_buffer.hidKey.push_back(KEY_ENTER);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "space") == 0)
         {
             _keys_state_buffer.space = true;
+            _keys_state_buffer.hidKey.push_back(KEY_SPACE);
             continue;
         } 
 

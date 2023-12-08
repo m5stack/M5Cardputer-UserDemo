@@ -121,6 +121,8 @@ void AppKeyboard::_update_kb_input()
                 memset(_input_buffer, 0, 8);
                 auto status = _data.hal->keyboard()->keysState();
 
+                
+
                 int count = 0;
                 for (auto i : status.hidKey) 
                 {

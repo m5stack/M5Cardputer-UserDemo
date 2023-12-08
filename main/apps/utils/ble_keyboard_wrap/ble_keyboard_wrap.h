@@ -18,7 +18,8 @@ enum BleKbWrapState_t
     ble_kb_wrap_state_connected,
 };
 
-
+// Stack overflow crush can not fix, menuconfig not working  
+// https://github.com/espressif/esp-idf/issues/9720
 void ble_keyboard_wrap_init(KEYBOARD::Keyboard* keyboard);
 void ble_keyboard_wrap_deinit();
 void ble_keyboard_wrap_update_input(uint8_t* input);
