@@ -29,13 +29,18 @@ namespace MOONCAKE
                 struct Data_t
                 {
                     HAL::Hal* hal = nullptr;
+                    uint32_t update_infos_time_count = 0;
+                    uint32_t update_kb_time_count = 0;
                 };
                 Data_t _data;
+                void _update_infos();
+                void _update_kb_input();
 
             public:
                 void onCreate() override;
                 void onResume() override;
                 void onRunning() override;
+                void onDestroy() override;
         };
 
         class AppKeyboard_Packer : public APP_PACKER_BASE

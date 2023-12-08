@@ -19,6 +19,10 @@ void Launcher::_boot_anim()
 {
     spdlog::info("start boot anim");
 
+    // If software restart 
+    if (esp_reset_reason() != ESP_RST_POWERON)
+        return;
+
     // Show logo
     _data.hal->display()->pushImage(0, 0, 240, 135, image_data_logo);
     _port_wait_enter();

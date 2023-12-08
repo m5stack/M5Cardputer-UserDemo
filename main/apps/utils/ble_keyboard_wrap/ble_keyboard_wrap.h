@@ -12,4 +12,15 @@
 #include "../../../hal/keyboard/keyboard.h"
 
 
+enum BleKbWrapState_t
+{
+    ble_kb_wrap_state_wait_connect = 0,
+    ble_kb_wrap_state_connected,
+};
+
+
 void ble_keyboard_wrap_init(KEYBOARD::Keyboard* keyboard);
+void ble_keyboard_wrap_deinit();
+void ble_keyboard_wrap_update_input(uint8_t* input);
+BleKbWrapState_t ble_keyboard_wrap_get_current_state();
+const char* ble_keyboard_wrap_get_device_name();

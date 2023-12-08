@@ -46,7 +46,8 @@
 // Keyboard_Class Keyboard = Keyboard_Class();
 
 #include "ble_keyboard_wrap.h"
-KEYBOARD::Keyboard* _keyboard = nullptr;
+static KEYBOARD::Keyboard* _keyboard = nullptr;
+static BleKbWrapState_t _keyboard_current_state =  ble_kb_wrap_state_wait_connect;
 
 
 static const char *TAG = "HID_DEV_DEMO";
@@ -132,70 +133,85 @@ void esp_hidd_send_consumer_value(uint8_t key_cmd, bool key_pressed) {
     return;
 }
 
-void ble_hid_demo_task(void *pvParameters) {
-    static bool send_volum_up = false;
-    ESP_LOGI(TAG, "ble_hid_demo_task start");
+// void ble_hid_demo_task(void *pvParameters) {
+//     // static bool send_volum_up = false;
+//     ESP_LOGI(TAG, "ble_hid_demo_task start");
 
-    // uint8_t buffer1[8] = {0, 0, 0x17, 0, 0, 0, 0, 0};
-    uint8_t buffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-    while (1) {
-        _keyboard->updateKeyList();
-        _keyboard->updateKeysState();
-        if (_keyboard->isChanged()) {
-            uint8_t modifier = 0;
-            if (_keyboard->isPressed()) {
-                memset(buffer, 0, 8);
-                auto status = _keyboard->keysState();
+//     // uint8_t buffer1[8] = {0, 0, 0x17, 0, 0, 0, 0, 0};
+//     uint8_t buffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+//     while (1) {
+//         // _keyboard->updateKeyList();
+//         // _keyboard->updateKeysState();
+//         if (_keyboard->isChanged()) {
+//             uint8_t modifier = 0;
+//             if (_keyboard->isPressed()) {
+//                 memset(buffer, 0, 8);
+//                 auto status = _keyboard->keysState();
 
-                int count = 0;
-                for (auto i : status.hidKey) {
-                    if (count < 6) {
-                        buffer[2 + count] = i;
-                        count++;
-                    }
-                }
+//                 int count = 0;
+//                 for (auto i : status.hidKey) {
+//                     if (count < 6) {
+//                         buffer[2 + count] = i;
+//                         count++;
+//                     }
+//                 }
 
-                if (status.ctrl) {
-                    ESP_LOGI(TAG, "CONTROL");
-                    modifier |= 0x01;
-                }
+//                 if (status.ctrl) {
+//                     ESP_LOGI(TAG, "CONTROL");
+//                     modifier |= 0x01;
+//                 }
 
-                if (status.shift) {
-                    ESP_LOGI(TAG, "SHIFT");
-                    modifier |= 0x02;
-                }
+//                 if (status.shift) {
+//                     ESP_LOGI(TAG, "SHIFT");
+//                     modifier |= 0x02;
+//                 }
 
-                if (status.alt) {
-                    ESP_LOGI(TAG, "ALT");
-                    modifier |= 0x03;
-                }
+//                 if (status.alt) {
+//                     ESP_LOGI(TAG, "ALT");
+//                     modifier |= 0x03;
+//                 }
 
-                buffer[0] = modifier;
+//                 buffer[0] = modifier;
 
-                ESP_LOG_BUFFER_HEX(TAG, buffer, 8);
+//                 ESP_LOG_BUFFER_HEX(TAG, buffer, 8);
 
-                esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer,
-                                       8);
-            } else {
-                memset(buffer, 0, 8);
-                esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer,
-                                       8);
-            }
-        }
-        vTaskDelay(50 / portTICK_PERIOD_MS);
-    }
-}
+//                 esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer,
+//                                        8);
+//             } else {
+//                 memset(buffer, 0, 8);
+//                 esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, buffer,
+//                                        8);
+//             }
+//         }
+//         vTaskDelay(50 / portTICK_PERIOD_MS);
+//     }
+// }
+
+
+// static StaticTask_t _xTaskBuffer;
+// static StackType_t* _ble_hid_update_task_stack = nullptr;
 
 void ble_hid_task_start_up(void) {
-    xTaskCreate(ble_hid_demo_task, "ble_hid_demo_task", 10 * 1024, NULL,
-                configMAX_PRIORITIES - 3, &s_ble_hid_param.task_hdl);
+    // xTaskCreate(ble_hid_demo_task, "ble_hid_update", 2000, NULL,
+    //             configMAX_PRIORITIES - 3, &s_ble_hid_param.task_hdl);
+
+    // // Dynamic 
+    // _ble_hid_update_task_stack = new StackType_t[4000];
+    // s_ble_hid_param.task_hdl = xTaskCreateStatic(ble_hid_demo_task, "ble_hid_update", 4000, NULL, 
+    // configMAX_PRIORITIES - 3, _ble_hid_update_task_stack, &_xTaskBuffer);
+
+    _keyboard_current_state = ble_kb_wrap_state_connected;
 }
 
 void ble_hid_task_shut_down(void) {
-    if (s_ble_hid_param.task_hdl) {
-        vTaskDelete(s_ble_hid_param.task_hdl);
-        s_ble_hid_param.task_hdl = NULL;
-    }
+    // if (s_ble_hid_param.task_hdl) {
+    //     vTaskDelete(s_ble_hid_param.task_hdl);
+    //     s_ble_hid_param.task_hdl = NULL;
+
+    //     // delete[] _ble_hid_update_task_stack;
+    // }
+
+    _keyboard_current_state = ble_kb_wrap_state_wait_connect;
 }
 
 static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base,
@@ -204,16 +220,20 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base,
     esp_hidd_event_data_t *param = (esp_hidd_event_data_t *)event_data;
     static const char *TAG       = "HID_DEV_BLE";
 
+    // printf("stack remain: %d\n", (unsigned int)uxTaskGetStackHighWaterMark(NULL));
+
     switch (event) {
         case ESP_HIDD_START_EVENT: {
-            ESP_LOGI(TAG, "START");
+            // ESP_LOGI(TAG, "START");
             esp_hid_ble_gap_adv_start();
             break;
         }
         case ESP_HIDD_CONNECT_EVENT: {
-            ESP_LOGI(TAG, "CONNECT");
-            ble_hid_task_start_up();  // todo: this should be on auth_complete
-                                      // (in GAP)
+            // ESP_LOGI(TAG, "CONNECT");
+            // ble_hid_task_start_up();  // todo: this should be on auth_complete
+            //                           // (in GAP)
+            _keyboard_current_state = ble_kb_wrap_state_connected;
+
             // M5.Display.clear();
             // M5.Display.fillRect(10, M5.Display.height() / 2 - 15,
             //                     M5.Display.width() - 20, 30, GREEN);
@@ -224,39 +244,41 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base,
             break;
         }
         case ESP_HIDD_PROTOCOL_MODE_EVENT: {
-            ESP_LOGI(TAG, "PROTOCOL MODE[%u]: %s",
-                     param->protocol_mode.map_index,
-                     param->protocol_mode.protocol_mode ? "REPORT" : "BOOT");
+            // ESP_LOGI(TAG, "PROTOCOL MODE[%u]: %s",
+            //          param->protocol_mode.map_index,
+            //          param->protocol_mode.protocol_mode ? "REPORT" : "BOOT");
             break;
         }
         case ESP_HIDD_CONTROL_EVENT: {
-            ESP_LOGI(TAG, "CONTROL[%u]: %sSUSPEND", param->control.map_index,
-                     param->control.control ? "EXIT_" : "");
+            // ESP_LOGI(TAG, "CONTROL[%u]: %sSUSPEND", param->control.map_index,
+            //          param->control.control ? "EXIT_" : "");
             break;
         }
         case ESP_HIDD_OUTPUT_EVENT: {
-            ESP_LOGI(TAG, "OUTPUT[%u]: %8s ID: %2u, Len: %d, Data:",
-                     param->output.map_index,
-                     esp_hid_usage_str(param->output.usage),
-                     param->output.report_id, param->output.length);
-            ESP_LOG_BUFFER_HEX(TAG, param->output.data, param->output.length);
+            // ESP_LOGI(TAG, "OUTPUT[%u]: %8s ID: %2u, Len: %d, Data:",
+            //          param->output.map_index,
+            //          esp_hid_usage_str(param->output.usage),
+            //          param->output.report_id, param->output.length);
+            // ESP_LOG_BUFFER_HEX(TAG, param->output.data, param->output.length);
             break;
         }
         case ESP_HIDD_FEATURE_EVENT: {
-            ESP_LOGI(TAG, "FEATURE[%u]: %8s ID: %2u, Len: %d, Data:",
-                     param->feature.map_index,
-                     esp_hid_usage_str(param->feature.usage),
-                     param->feature.report_id, param->feature.length);
-            ESP_LOG_BUFFER_HEX(TAG, param->feature.data, param->feature.length);
+            // ESP_LOGI(TAG, "FEATURE[%u]: %8s ID: %2u, Len: %d, Data:",
+            //          param->feature.map_index,
+            //          esp_hid_usage_str(param->feature.usage),
+            //          param->feature.report_id, param->feature.length);
+            // ESP_LOG_BUFFER_HEX(TAG, param->feature.data, param->feature.length);
             break;
         }
         case ESP_HIDD_DISCONNECT_EVENT: {
-            ESP_LOGI(TAG, "DISCONNECT: %s",
-                     esp_hid_disconnect_reason_str(
-                         esp_hidd_dev_transport_get(param->disconnect.dev),
-                         param->disconnect.reason));
-            ble_hid_task_shut_down();
+            // ESP_LOGI(TAG, "DISCONNECT: %s",
+            //          esp_hid_disconnect_reason_str(
+            //              esp_hidd_dev_transport_get(param->disconnect.dev),
+            //              param->disconnect.reason));
+            // ble_hid_task_shut_down();
             esp_hid_ble_gap_adv_start();
+            _keyboard_current_state = ble_kb_wrap_state_wait_connect;
+
             // M5.Display.clear();
 
             // M5.Display.fillRect(10, M5.Display.height() / 2 - 15,
@@ -268,7 +290,7 @@ static void ble_hidd_event_callback(void *handler_args, esp_event_base_t base,
             break;
         }
         case ESP_HIDD_STOP_EVENT: {
-            ESP_LOGI(TAG, "STOP");
+            // ESP_LOGI(TAG, "STOP");
             break;
         }
         default:
@@ -333,4 +355,28 @@ void ble_keyboard_wrap_init(KEYBOARD::Keyboard* keyboard) {
     ESP_ERROR_CHECK(esp_hidd_dev_init(&ble_hid_config, ESP_HID_TRANSPORT_BLE,
                                       ble_hidd_event_callback,
                                       &s_ble_hid_param.hid_dev));
+}
+
+
+void ble_keyboard_wrap_deinit()
+{
+    esp_hidd_dev_deinit(s_ble_hid_param.hid_dev);
+}
+
+
+void ble_keyboard_wrap_update_input(uint8_t* input)
+{
+    esp_hidd_dev_input_set(s_ble_hid_param.hid_dev, 0, 1, input, 8);
+}
+
+
+BleKbWrapState_t ble_keyboard_wrap_get_current_state()
+{
+    return _keyboard_current_state;
+}
+
+
+const char* ble_keyboard_wrap_get_device_name()
+{
+    return ble_hid_config.device_name;
 }
