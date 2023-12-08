@@ -121,10 +121,8 @@ void AppKeyboard::_update_kb_input()
                 memset(_input_buffer, 0, 8);
                 auto status = _data.hal->keyboard()->keysState();
 
-                
-
                 int count = 0;
-                for (auto i : status.hidKey) 
+                for (auto& i : status.hidKey) 
                 {
                     if (count < 6) 
                     {
@@ -139,7 +137,7 @@ void AppKeyboard::_update_kb_input()
                     modifier |= 0x01;
                 }
 
-                if (status.shift) {
+                if (status.shift || _data.hal->keyboard()->capslocked()) {
                     // ESP_LOGI(TAG, "SHIFT");
                     modifier |= 0x02;
                 }
