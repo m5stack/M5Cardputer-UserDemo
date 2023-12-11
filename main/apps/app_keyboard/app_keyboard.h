@@ -33,8 +33,9 @@ namespace MOONCAKE
                     uint32_t update_kb_time_count = 0;
                 };
                 Data_t _data;
-                void _update_infos();
-                void _update_kb_input();
+                void _ble_kb_init();
+                void _ble_kb_update_infos();
+                void _ble_kb_update_kb_input();
 
             public:
                 void onCreate() override;

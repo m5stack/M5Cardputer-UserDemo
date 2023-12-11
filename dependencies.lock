@@ -1,10 +1,10 @@
 dependencies:
   espressif/cmake_utilities:
-    component_hash: c3f351bed6fdb3d91bee6076740cb13d22e2c7bfcdd78969a65b46943885bbd4
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
     source:
       service_url: https://api.components.espressif.com/
       type: service
-    version: 0.5.2
+    version: 0.5.3
   espressif/esp-now:
     component_hash: 7355037518944af5d0ea20fe48aa0a8cf82081599b6fbd83f086ee8b39df87c1
     source:
