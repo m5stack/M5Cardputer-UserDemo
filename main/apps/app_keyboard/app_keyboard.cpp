@@ -17,7 +17,8 @@
 using namespace MOONCAKE::APPS;
 
 
-#define TEST_USE_BLE
+// #define TEST_USE_BLE
+#define TEST_USE_USB
 
 
 void AppKeyboard::onCreate()
@@ -47,6 +48,9 @@ void AppKeyboard::onResume()
     #ifdef TEST_USE_BLE
     _ble_kb_init();
     #endif
+    #ifdef TEST_USE_USB
+    _usb_kb_init();
+    #endif
 }
 
 
@@ -62,6 +66,10 @@ void AppKeyboard::onRunning()
     #ifdef TEST_USE_BLE
     _ble_kb_update_infos();
     _ble_kb_update_kb_input();
+    #endif
+    #ifdef TEST_USE_USB
+    _usb_kb_update_infos();
+    _usb_kb_update_kb_input();
     #endif
 }
 

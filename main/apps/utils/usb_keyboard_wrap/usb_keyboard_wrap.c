@@ -40,8 +40,8 @@
 // }
 
 #ifdef CONFIG_SUBCLASS_KEYBOARD
-static void button_keyboard_cb(void *arg, void *arg2)
-{
+// static void button_keyboard_cb(void *arg, void *arg2)
+// {
     // button_handle_t button_hdl = (button_handle_t)arg;
     // int button_gpio = get_button_gpio(button_hdl);
     // uint8_t _keycode[6] = { 0 };
@@ -55,11 +55,11 @@ static void button_keyboard_cb(void *arg, void *arg2)
     //     break;
 
     // case EXAMPLE_BUTTON_LEFT:
-    //     _keycode[0] = HID_KEY_L;
+        // _keycode[0] = HID_KEY_L;
     //     break;
 
     // case EXAMPLE_BUTTON_RIGHT:
-    //     _keycode[0] = HID_KEY_R;
+        // _keycode[0] = HID_KEY_R;
     //     break;
 
     // default:
@@ -67,10 +67,10 @@ static void button_keyboard_cb(void *arg, void *arg2)
     // }
     // tinyusb_hid_keyboard_report(_keycode);
     // ESP_LOGI(TAG, "Keyboard %c", _keycode[0] - HID_KEY_A + 'a');
-}
+// }
 #elif defined CONFIG_SUBCLASS_MOUSE
-static void button_mouse_cb(void *arg, void *arg2)
-{
+// static void button_mouse_cb(void *arg, void *arg2)
+// {
     // button_handle_t button_hdl = (button_handle_t)arg;
     // int button_gpio = get_button_gpio(button_hdl);
     // int mouse_offset_x = 0, mouse_offset_y = 0;
@@ -96,7 +96,7 @@ static void button_mouse_cb(void *arg, void *arg2)
     // }
     // tinyusb_hid_mouse_move_report(mouse_offset_x, mouse_offset_y, 0, 0);
     // ESP_LOGI(TAG, "Mouse x=%d y=%d", mouse_offset_x, mouse_offset_y);
-}
+// }
 #endif
 
 //--------------------------------------------------------------------+
@@ -111,32 +111,32 @@ static void tusb_device_task(void *arg)
 }
 
 
-// Invoked when device is mounted
-void tud_mount_cb(void)
-{
-    ESP_LOGI(TAG, "USB Mount");
-}
+// // Invoked when device is mounted
+// void tud_mount_cb(void)
+// {
+//     ESP_LOGI(TAG, "USB Mount");
+// }
 
-// Invoked when device is unmounted
-void tud_umount_cb(void)
-{
-    ESP_LOGI(TAG, "USB Un-Mount");
-}
+// // Invoked when device is unmounted
+// void tud_umount_cb(void)
+// {
+//     ESP_LOGI(TAG, "USB Un-Mount");
+// }
 
-// Invoked when usb bus is suspended
-// remote_wakeup_en : if host allow us  to perform remote wakeup
-// Within 7ms, device must draw an average of current less than 2.5 mA from bus
-void tud_suspend_cb(bool remote_wakeup_en)
-{
-    (void) remote_wakeup_en;
-    ESP_LOGI(TAG, "USB Suspend");
-}
+// // Invoked when usb bus is suspended
+// // remote_wakeup_en : if host allow us  to perform remote wakeup
+// // Within 7ms, device must draw an average of current less than 2.5 mA from bus
+// void tud_suspend_cb(bool remote_wakeup_en)
+// {
+//     (void) remote_wakeup_en;
+//     ESP_LOGI(TAG, "USB Suspend");
+// }
 
-// Invoked when usb bus is resumed
-void tud_resume_cb(void)
-{
-    ESP_LOGI(TAG, "USB Resume");
-}
+// // Invoked when usb bus is resumed
+// void tud_resume_cb(void)
+// {
+//     ESP_LOGI(TAG, "USB Resume");
+// }
 
 //--------------------------------------------------------------------+
 // USB PHY config
@@ -153,12 +153,15 @@ static void usb_phy_init(void)
     usb_new_phy(&phy_conf, &phy_hdl);
 }
 
+// static TaskHandle_t _task_handler;
+
 void usb_kb_wrap_init(void)
 {
     // switch esp usb phy to usb-otg
     usb_phy_init();
     tud_init(BOARD_TUD_RHPORT);
     xTaskCreate(tusb_device_task, "TinyUSB", 4096, NULL, 5, NULL);
+    // xTaskCreate(tusb_device_task, "TinyUSB", 4096, NULL, 5, &_task_handler);
 
     // /* buttons init, buttons used to simulate keyboard or mouse events */
     // button_config_t cfg = {
@@ -203,3 +206,9 @@ void usb_kb_wrap_report(uint8_t* keycode)
 {
     tinyusb_hid_keyboard_report(keycode);
 }
+
+
+// void usb_kb_wrap_deinit()
+// {
+//     vTaskDelete(_task_handler);
+// }
