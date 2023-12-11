@@ -26,15 +26,27 @@ namespace MOONCAKE
         class AppKeyboard : public APP_BASE
         {
             private:
+                enum KeyboardType_t
+                {
+                    kb_type_ble = 0,
+                    kb_type_usb,
+                };
+
                 struct Data_t
                 {
                     HAL::Hal* hal = nullptr;
                     uint32_t update_infos_time_count = 0;
                     uint32_t update_kb_time_count = 0;
+                    KeyboardType_t kb_type = kb_type_ble;
                 };
                 Data_t _data;
-                void _update_infos();
-                void _update_kb_input();
+                void _select_kb_type();
+                void _ble_kb_init();
+                void _ble_kb_update_infos();
+                void _ble_kb_update_kb_input();
+                void _usb_kb_init();
+                void _usb_kb_update_infos();
+                void _usb_kb_update_kb_input();
 
             public:
                 void onCreate() override;

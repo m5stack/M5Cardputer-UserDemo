@@ -12,10 +12,13 @@
 #include "spdlog/spdlog.h"
 #include "../utils/wifi_common_test/wifi_common_test.h"
 #include "../utils/theme/theme_define.h"
-#include "../utils/ble_keyboard_wrap/ble_keyboard_wrap.h"
 
 
 using namespace MOONCAKE::APPS;
+
+
+// #define TEST_USE_BLE
+// #define TEST_USE_USB
 
 
 void AppKeyboard::onCreate()
@@ -38,12 +41,23 @@ void AppKeyboard::onResume()
         _data.hal->canvas()->setTextSize(1);
         _data.hal->canvas_update();
 
-
         // Start ble keyboard 
         spdlog::info("remain before: {}", uxTaskGetStackHighWaterMark(NULL));
     }
 
-    ble_keyboard_wrap_init(_data.hal->keyboard());
+    _select_kb_type();
+
+    // #ifdef TEST_USE_BLE
+    // _ble_kb_init();
+    // #endif
+    // #ifdef TEST_USE_USB
+    // _usb_kb_init();
+    // #endif
+
+    if (_data.kb_type == kb_type_ble)
+        _ble_kb_init();
+    else if (_data.kb_type == kb_type_usb)
+        _usb_kb_init();
 }
 
 
@@ -56,8 +70,25 @@ void AppKeyboard::onRunning()
         destroyApp();
     }
 
-    _update_infos();
-    _update_kb_input();
+    // #ifdef TEST_USE_BLE
+    // _ble_kb_update_infos();
+    // _ble_kb_update_kb_input();
+    // #endif
+    // #ifdef TEST_USE_USB
+    // _usb_kb_update_infos();
+    // _usb_kb_update_kb_input();
+    // #endif
+
+    if (_data.kb_type == kb_type_ble)
+    {
+        _ble_kb_update_infos();
+        _ble_kb_update_kb_input();
+    }
+    else if (_data.kb_type == kb_type_usb)
+    {
+        _usb_kb_update_infos();
+        _usb_kb_update_kb_input();
+    }
 }
 
 
@@ -69,99 +100,4 @@ void AppKeyboard::onDestroy()
     delay(200);
     esp_restart();
     delay(10000);
-}
-
-
-void AppKeyboard::_update_infos()
-{
-    if (millis() - _data.update_infos_time_count > 500)
-    {
-        // spdlog::info("remain: {}", uxTaskGetStackHighWaterMark(NULL));
-
-        _data.hal->canvas()->fillScreen(THEME_COLOR_BG);
-
-        _data.hal->canvas()->setCursor(0, 0);
-        _data.hal->canvas()->setTextColor(TFT_ORANGE, THEME_COLOR_BG);
-        _data.hal->canvas()->printf("[BLE Keyboard]\n");
-        _data.hal->canvas()->printf("> Name: %s\n", ble_keyboard_wrap_get_device_name());
-
-        // State 
-        _data.hal->canvas()->printf("> State: ");
-        _data.hal->canvas()->setTextColor(
-            ble_keyboard_wrap_get_current_state() == ble_kb_wrap_state_connected ? TFT_GREENYELLOW : TFT_ORANGE, 
-            THEME_COLOR_BG
-        );
-        _data.hal->canvas()->printf(
-            "%s\n", 
-            ble_keyboard_wrap_get_current_state() == ble_kb_wrap_state_connected ? "Connected" : "Wait connect.."
-        );
-
-        _data.hal->canvas_update();
-        _data.update_infos_time_count = millis();
-    }
-}
-
-
-static uint8_t _input_buffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-
-void AppKeyboard::_update_kb_input()
-{
-    // spdlog::info("remain: {}", uxTaskGetStackHighWaterMark(NULL));
-
-    if (ble_keyboard_wrap_get_current_state() != ble_kb_wrap_state_connected)
-        return;
-
-    if (millis() - _data.update_kb_time_count > 10)
-    {
-        if (_data.hal->keyboard()->isChanged()) 
-        {
-            uint8_t modifier = 0;
-            if (_data.hal->keyboard()->isPressed()) 
-            {
-                memset(_input_buffer, 0, 8);
-                auto status = _data.hal->keyboard()->keysState();
-
-                
-
-                int count = 0;
-                for (auto i : status.hidKey) 
-                {
-                    if (count < 6) 
-                    {
-                        _input_buffer[2 + count] = i;
-                        count++;
-                    }
-                }
-
-                if (status.ctrl) 
-                {
-                    // ESP_LOGI(TAG, "CONTROL");
-                    modifier |= 0x01;
-                }
-
-                if (status.shift) {
-                    // ESP_LOGI(TAG, "SHIFT");
-                    modifier |= 0x02;
-                }
-
-                if (status.alt) 
-                {
-                    // ESP_LOGI(TAG, "ALT");
-                    modifier |= 0x03;
-                }
-
-                _input_buffer[0] = modifier;
-
-                // ESP_LOG_BUFFER_HEX(TAG, buffer, 8);
-                ble_keyboard_wrap_update_input(_input_buffer);
-            } 
-            else 
-            {
-                memset(_input_buffer, 0, 8);
-                ble_keyboard_wrap_update_input(_input_buffer);
-            }
-        }
-
-        _data.update_kb_time_count = millis();
-    }
 }
