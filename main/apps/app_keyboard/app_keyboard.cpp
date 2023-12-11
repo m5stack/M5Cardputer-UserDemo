@@ -18,7 +18,7 @@ using namespace MOONCAKE::APPS;
 
 
 // #define TEST_USE_BLE
-#define TEST_USE_USB
+// #define TEST_USE_USB
 
 
 void AppKeyboard::onCreate()
@@ -45,12 +45,19 @@ void AppKeyboard::onResume()
         spdlog::info("remain before: {}", uxTaskGetStackHighWaterMark(NULL));
     }
 
-    #ifdef TEST_USE_BLE
-    _ble_kb_init();
-    #endif
-    #ifdef TEST_USE_USB
-    _usb_kb_init();
-    #endif
+    _select_kb_type();
+
+    // #ifdef TEST_USE_BLE
+    // _ble_kb_init();
+    // #endif
+    // #ifdef TEST_USE_USB
+    // _usb_kb_init();
+    // #endif
+
+    if (_data.kb_type == kb_type_ble)
+        _ble_kb_init();
+    else if (_data.kb_type == kb_type_usb)
+        _usb_kb_init();
 }
 
 
@@ -63,14 +70,25 @@ void AppKeyboard::onRunning()
         destroyApp();
     }
 
-    #ifdef TEST_USE_BLE
-    _ble_kb_update_infos();
-    _ble_kb_update_kb_input();
-    #endif
-    #ifdef TEST_USE_USB
-    _usb_kb_update_infos();
-    _usb_kb_update_kb_input();
-    #endif
+    // #ifdef TEST_USE_BLE
+    // _ble_kb_update_infos();
+    // _ble_kb_update_kb_input();
+    // #endif
+    // #ifdef TEST_USE_USB
+    // _usb_kb_update_infos();
+    // _usb_kb_update_kb_input();
+    // #endif
+
+    if (_data.kb_type == kb_type_ble)
+    {
+        _ble_kb_update_infos();
+        _ble_kb_update_kb_input();
+    }
+    else if (_data.kb_type == kb_type_usb)
+    {
+        _usb_kb_update_infos();
+        _usb_kb_update_kb_input();
+    }
 }
 
 

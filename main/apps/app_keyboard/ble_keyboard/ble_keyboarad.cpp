@@ -10,7 +10,6 @@
  */
 #include "../app_keyboard.h"
 #include "spdlog/spdlog.h"
-#include "../../utils/wifi_common_test/wifi_common_test.h"
 #include "../../utils/theme/theme_define.h"
 #include "../../utils/ble_keyboard_wrap/ble_keyboard_wrap.h"
 

@@ -10,7 +10,6 @@
  */
 #include "../app_keyboard.h"
 #include "spdlog/spdlog.h"
-#include "../../utils/wifi_common_test/wifi_common_test.h"
 #include "../../utils/theme/theme_define.h"
 #include "../../utils/usb_keyboard_wrap/usb_keyboard_wrap.h"
 
@@ -89,7 +88,7 @@ void AppKeyboard::_usb_kb_update_infos()
 }
 
 
-static uint8_t _input_buffer[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+static uint8_t _input_buffer[6] = {0, 0, 0, 0, 0, 0};
 
 void AppKeyboard::_usb_kb_update_kb_input()
 {
@@ -103,15 +102,15 @@ void AppKeyboard::_usb_kb_update_kb_input()
             uint8_t modifier = 0;
             if (_data.hal->keyboard()->isPressed()) 
             {
-                memset(_input_buffer, 0, 8);
+                memset(_input_buffer, 0, 6);
                 auto status = _data.hal->keyboard()->keysState();
 
                 int count = 0;
                 for (auto& i : status.hidKey) 
                 {
-                    if (count < 6) 
+                    if (count < 5) 
                     {
-                        _input_buffer[2 + count] = i;
+                        _input_buffer[1 + count] = i;
                         count++;
                     }
                 }
@@ -143,7 +142,7 @@ void AppKeyboard::_usb_kb_update_kb_input()
             } 
             else 
             {
-                memset(_input_buffer, 0, 8);
+                memset(_input_buffer, 0, 6);
                 usb_kb_wrap_report(_input_buffer);
             }
         }

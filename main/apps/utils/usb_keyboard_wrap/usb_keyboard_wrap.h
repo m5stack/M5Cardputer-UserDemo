@@ -1,7 +1,7 @@
 /**
  * @file usb_keyboard_wrap.h
  * @author Forairaaaaa
- * @brief 
+ * @brief Ref: https://github.com/espressif/esp-iot-solution/tree/master/examples/usb/device/usb_hid_device
  * @version 0.1
  * @date 2023-12-11
  * 
