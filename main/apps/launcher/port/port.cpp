@@ -268,11 +268,20 @@ void Launcher::_port_update_system_state()
         auto bat_level = _data.hal->getBatLevel();
         spdlog::info("get bat level: {}", bat_level);
 
-        if (bat_level >= 75)
+        // if (bat_level >= 75)
+        //     _data.system_state.bat_state = 1;
+        // else if (bat_level >= 50)
+        //     _data.system_state.bat_state = 2;
+        // else if (bat_level >= 25)
+        //     _data.system_state.bat_state = 3;
+        // else
+        //     _data.system_state.bat_state = 4;
+
+        if (bat_level >= 100)
             _data.system_state.bat_state = 1;
-        else if (bat_level >= 50)
+        else if (bat_level >= 75)
             _data.system_state.bat_state = 2;
-        else if (bat_level >= 25)
+        else if (bat_level >= 50)
             _data.system_state.bat_state = 3;
         else
             _data.system_state.bat_state = 4;
