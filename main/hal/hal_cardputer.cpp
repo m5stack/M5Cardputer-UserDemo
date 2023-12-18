@@ -112,23 +112,23 @@ void HalCardputer::init()
 }
 
 
-double getBatVolBfb(double batVcc) //获取电压的百分比，经过换算并非线性关系
-{
-    double bfb = 0.0;
+// double getBatVolBfb(double batVcc) //获取电压的百分比，经过换算并非线性关系
+// {
+//     double bfb = 0.0;
 
-    //y = 497.50976 x4 - 7,442.07254 x3 + 41,515.70648 x2 - 102,249.34377 x + 93,770.99821
-    bfb = 497.50976 * batVcc * batVcc * batVcc * batVcc
-            - 7442.07254 * batVcc * batVcc * batVcc
-            + 41515.70648 * batVcc * batVcc
-            - 102249.34377 * batVcc
-            + 93770.99821;
-    if (bfb > 100) 
-        bfb = 100.0;
-    else if (bfb < 0) 
-        bfb = 3.0;
+//     //y = 497.50976 x4 - 7,442.07254 x3 + 41,515.70648 x2 - 102,249.34377 x + 93,770.99821
+//     bfb = 497.50976 * batVcc * batVcc * batVcc * batVcc
+//             - 7442.07254 * batVcc * batVcc * batVcc
+//             + 41515.70648 * batVcc * batVcc
+//             - 102249.34377 * batVcc
+//             + 93770.99821;
+//     if (bfb > 100) 
+//         bfb = 100.0;
+//     else if (bfb < 0) 
+//         bfb = 3.0;
 
-    return bfb;
-}
+//     return bfb;
+// }
 
 
 uint8_t HalCardputer::getBatLevel()
@@ -138,7 +138,23 @@ uint8_t HalCardputer::getBatLevel()
 
     // return 100;
     // return (uint8_t)getBatVolBfb(4.2);
-    return (uint8_t)getBatVolBfb((double)((adc_read_get_value() * 2 + 100) / 1000));
+    // return (uint8_t)getBatVolBfb((double)((adc_read_get_value() * 2 + 100) / 1000));
+
+
+    // https://docs.m5stack.com/zh_CN/core/basic_v2.7
+    double bat_v = adc_read_get_value() * 2;
+    uint8_t result = 0;
+    if (bat_v >= 4.12)
+        result = 100;
+    else if (bat_v >= 3.88)
+        result = 75;
+    else if (bat_v >= 3.61)
+        result = 50;
+    else if (bat_v >= 3.40)
+        result = 25;
+    else
+        result = 0;
+    return result;
 }
 
 
