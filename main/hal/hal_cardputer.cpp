@@ -142,7 +142,8 @@ uint8_t HalCardputer::getBatLevel()
 
 
     // https://docs.m5stack.com/zh_CN/core/basic_v2.7
-    double bat_v = adc_read_get_value() * 2;
+    double bat_v = static_cast<double>(adc_read_get_value()) * 2 / 1000;
+    spdlog::info("batV: {}", bat_v);
     uint8_t result = 0;
     if (bat_v >= 4.12)
         result = 100;
