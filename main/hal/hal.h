@@ -14,6 +14,7 @@
 #include "mic/Mic_Class.hpp"
 #include "speaker/Speaker_Class.hpp"
 #include "button/Button.h"
+#include "sdcard/sdcard.h"
 #include <iostream>
 #include <string>
 
@@ -35,6 +36,7 @@ namespace HAL
             m5::Mic_Class* _mic;
             m5::Speaker_Class* _speaker;
             Button* _homeButton;
+            SDCard* _sdcard;
 
             bool _sntp_adjusted;
 
@@ -48,6 +50,7 @@ namespace HAL
             _mic(nullptr),
             _speaker(nullptr),
             _homeButton(nullptr),
+            _sdcard(nullptr),
             _sntp_adjusted(false)
             {}
 
@@ -60,6 +63,7 @@ namespace HAL
             inline m5::Mic_Class* mic() { return _mic; }
             inline m5::Speaker_Class* Speaker() { return _speaker; }
             inline Button* homeButton() { return _homeButton; }
+            inline SDCard* sdcard() { return _sdcard; }
 
             inline void setSntpAdjusted(bool isAdjusted) { _sntp_adjusted = isAdjusted; }
             inline bool isSntpAdjusted(void) { return _sntp_adjusted; }

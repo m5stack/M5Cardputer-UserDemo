@@ -21,6 +21,7 @@ namespace HAL
             void _speaker_init();
             void _button_init();
             void _bat_init();
+            void _sdcard_init();
 
         public:
             std::string type() override { return "cardputer"; }
