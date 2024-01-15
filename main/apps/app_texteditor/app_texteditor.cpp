@@ -37,7 +37,7 @@ void AppTextEditor::onResume() {
     _canvas->setTextSize(FONT_SIZE_REPL);
     _canvas->setCursor(0, 0);
 
-    if (!_sdcard->mount()) {
+    if (!_sdcard->mount(false)) {
         _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
         _canvas->print("SD card mount failed\nPress enter to try again\nctrl + q to quit\n");
         _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);

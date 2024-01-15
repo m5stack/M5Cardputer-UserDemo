@@ -26,7 +26,7 @@
 static const char *MOUNT_POINT = "/sdcard";
 static const char *TAG = "SDCARD";
 
-bool SDCard::mount() {
+bool SDCard::mount(bool format_if_mount_failed) {
     if (mounted) {
         ESP_LOGI(TAG, "SD card already mounted");
         return true;
@@ -60,7 +60,7 @@ bool SDCard::mount() {
     slot_config.host_id = SPI3_HOST;
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = false,
+        .format_if_mount_failed = format_if_mount_failed,
         .max_files = 5,
         .allocation_unit_size = 16 * 1024
     };

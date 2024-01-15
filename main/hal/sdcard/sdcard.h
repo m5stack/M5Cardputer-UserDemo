@@ -16,7 +16,7 @@
 class SDCard
 {
 	public:
-		bool mount();
+		bool mount(bool format_if_mount_failed);
 		bool eject();
 		bool is_mounted();
 		char *get_mount_point();
