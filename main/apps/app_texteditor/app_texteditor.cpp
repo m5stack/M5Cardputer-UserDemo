@@ -29,6 +29,7 @@ void AppTextEditor::onResume() {
     spdlog::info("{} onResume", getAppName());
     ANIM_APP_OPEN();
     _data.text_buffer = "";
+    _data.lines = 1;
     _canvas_clear();
     _canvas->setTextScroll(true);
     _canvas->setBaseColor(THEME_COLOR_BG);
@@ -38,9 +39,8 @@ void AppTextEditor::onResume() {
     _canvas->setCursor(0, 0);
 
     if (!_sdcard->mount(false)) {
-        _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-        _canvas->print("SD card mount failed\nPress enter to try again\nctrl + q to quit\n");
-        _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
+        _dialog("SD card mount failed\nPress enter to try again\nctrl + q to quit\nctrl + f to format", false);
+        _data.waiting_user_input = false;
     } else {
         spdlog::info("SD card mounted");
         char * filename = _sdcard->get_filepath("note.txt");
@@ -50,31 +50,32 @@ void AppTextEditor::onResume() {
             free(filename);
             spdlog::info("file not exists");
             _canvas->print(" 1 ");
+            _data.lines++;
             _canvas_update();
             return;
         }
 
         FILE *f = fopen(filename, "r");
         if (f != NULL) {
-            int line_num = 1;
+            _data.lines = 1;
             char text[80];
             while (fgets(text, 80, f)) {
-                if (line_num < 10) {
+                if (_data.lines < 10) {
                     _canvas->print(" ");
                 }
-                _canvas->print(line_num);
+                _canvas->print(_data.lines);
                 _canvas->print(" ");
                 _canvas->print(text);
-                line_num++;
+                _data.lines++;
             }
             if (_canvas->getCursorX() == 0) {
-                if (line_num < 10) {
+                if (_data.lines < 10) {
                     _canvas->print(" ");
                 }
-                _canvas->print(line_num);
+                _canvas->print(_data.lines);
                 _canvas->print(" ");
             }
-            _data.lines = line_num - 1;
+            _data.lines++;
         }
         free(filename);
     }
@@ -93,14 +94,8 @@ void AppTextEditor::onRunning() {
             char * filename = _sdcard->get_filepath("note.txt");
             FILE *f = fopen(filename, "a");
             if (f == NULL) {
-                _canvas_clear();
-                _canvas->setCursor(0, 0);
-                spdlog::error("Failed to open file for writing");
-                _canvas->setBaseColor(THEME_COLOR_BG);
-                _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-                _canvas->print("Failed to open file for writing\nctrl + q to quit\n");
-                _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
-                _data.waiting_user_input = true;
+                free(filename);
+                _dialog("Failed to open file for writing\nctrl + q to quit\n", false);
                 _canvas_update();
                 free(filename);
                 return;
@@ -113,6 +108,24 @@ void AppTextEditor::onRunning() {
         
         destroyApp();
     }
+}
+
+void AppTextEditor::_dialog(const std::string& message, bool can_skip) {
+    spdlog::info("dialog: {}", message);
+    _canvas_clear();
+    _canvas->setCursor(0, 0);
+    _data.text_buffer = "";
+    _canvas->setBaseColor(THEME_COLOR_BG);
+    _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
+    _canvas->print(message.c_str());
+    _data.waiting_user_input = true;
+    _data.can_skip = can_skip;
+    _data.dialog_action = DialogAction_t::none;
+    if (can_skip) {
+        _canvas->print("\nPress enter to continue\n");
+    }
+    _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
+    _canvas_update();
 }
 
 void AppTextEditor::_update_input() {
@@ -130,10 +143,6 @@ void AppTextEditor::_update_input() {
             // If enter 
             if (_keyboard->keysState().enter)
             {
-                if (!_sdcard->is_mounted()) {
-                    onResume();
-                }
-
                 _canvas->print(" \n");
                 if (_data.lines < 10) {
                     _canvas->print(" ");
@@ -145,43 +154,46 @@ void AppTextEditor::_update_input() {
                 if (_data.waiting_user_input) {
                     _data.waiting_user_input = false;
                     _data.last_key_num = _keyboard->keyList().size();
-                    if (_data.text_buffer == "y" || _data.text_buffer == "Y") {
-                        
-                        char * filename = _sdcard->get_filepath("note.txt");
-                        if (_sdcard->file_exists(filename)) {
-                            if (remove(filename) != 0) {
-                                _canvas_clear();
-                                _canvas->setCursor(0, 0);
-                                spdlog::error("Failed to delete file");
-                                _canvas->setBaseColor(THEME_COLOR_BG);
-                                _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-                                _canvas->print("Failed to delete file\n");
-                                _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
-                                _canvas_update();
-                                free(filename);
+                    if (_data.dialog_action == DialogAction_t::none) {
+                        spdlog::info("dialog skipped");
+                    } else if (_data.text_buffer == "y" || _data.text_buffer == "Y") {
+                        if (_data.dialog_action == DialogAction_t::delete_file) {
+                            char * filename = _sdcard->get_filepath("note.txt");
+                            if (_sdcard->file_exists(filename)) {
+                                if (remove(filename) != 0) {
+                                    free(filename);
+                                    _dialog("Failed to delete file", true);
+                                    return;
+                                }
+                                spdlog::info("file deleted");
+                            }
+                            free(filename);
+                        } else if (_data.dialog_action == DialogAction_t::format) {
+                            if (!_sdcard->eject()) {
+                                _dialog("Failed to unmount SD card", true);
                                 return;
                             }
-                            spdlog::info("file deleted");
+                            if (!_sdcard->mount(true)) {
+                                _dialog("Failed to mount SD card, is it inserted?", true);
+                                return;
+                            }
+                            _dialog("SD card formatted", true);
+                            return;
                         }
-                        free(filename);
                     } 
-                    
                     onResume();
                     return;
+                }
+
+                if (!_sdcard->is_mounted()) {
+                    onResume();
                 }
 
                 char * filename = _sdcard->get_filepath("note.txt");
                 FILE *f = fopen(filename, "a");
                 if (f == NULL) {
-                    _canvas_clear();
-                    _canvas->setCursor(0, 0);
-                    spdlog::error("Failed to open file for writing");
-                    _canvas->setBaseColor(THEME_COLOR_BG);
-                    _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-                    _canvas->print("Failed to open file for writing\n");
-                    _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
-                    _canvas_update();
                     free(filename);
+                    _dialog("Failed to open file for writing", true);
                     return;
                 }
                 free(filename);
@@ -204,18 +216,8 @@ void AppTextEditor::_update_input() {
             {
                 if (_keyboard->keysState().ctrl)
                 {
-                    _data.waiting_user_input = false;
-                    _data.text_buffer = "";
-                    _data.last_key_num = _keyboard->keyList().size();
-                    _canvas_clear();
-                    _canvas->setCursor(0, 0);
-                    _data.text_buffer = "";
-                    _canvas->setBaseColor(THEME_COLOR_BG);
-                    _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-                    _canvas->print("Delete file? [y/N]: ");
-                    _data.waiting_user_input = true;
-                    _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
-                    _canvas_update();
+                    _dialog("Delete file? [y/N]: ", false);
+                    _data.dialog_action = DialogAction_t::delete_file;
                 } 
                 
                 else if (_data.text_buffer.size())
@@ -254,17 +256,8 @@ void AppTextEditor::_update_input() {
                     destroyApp();
                 } else if (_keyboard->isKeyPressing(34)) { // F
                     spdlog::info("format sd card");
-                    /*
-                    _canvas_clear();
-                    _canvas->setCursor(0, 0);
-                    _data.text_buffer = "";
-                    _canvas->setBaseColor(THEME_COLOR_BG);
-                    _canvas->setTextColor(TFT_RED, THEME_COLOR_BG);
-                    _canvas->print("Fordmat SD card? [y/N]: ");
-                    _data.waiting_user_input = true;
-                    _canvas->setTextColor(TFT_WHITE, THEME_COLOR_BG);
-                    _canvas_update();
-                    */
+                    _dialog("Format SD card? [y/N]: ", false);
+                    _data.dialog_action = DialogAction_t::format;
                 }
                 return;
             }

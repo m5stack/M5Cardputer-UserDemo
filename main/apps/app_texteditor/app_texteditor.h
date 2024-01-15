@@ -19,6 +19,11 @@
 
 namespace MOONCAKE {
     namespace APPS {
+        enum DialogAction_t {
+            none = 0,
+            delete_file,
+            format,
+        };
         class AppTextEditor : public APP_BASE {
             private:
                 struct Data_t {
@@ -30,11 +35,14 @@ namespace MOONCAKE {
                     uint32_t cursor_update_period = 500;
                     bool cursor_state = false;
                     bool waiting_user_input = false;
+                    bool can_skip = false;
+                    DialogAction_t dialog_action = DialogAction_t::none;
                 };
                 Data_t _data;
 
                 void _update_input();
                 void _update_cursor();
+                void _dialog(const std::string& message, bool can_skip);
 
             public:
                 void onCreate() override;
