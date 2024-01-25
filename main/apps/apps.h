@@ -18,3 +18,4 @@
 #include "app_set_wifi/app_set_wifi.h"
 #include "app_timer/app_timer.h"
 #include "app_keyboard/app_keyboard.h"
+#include "app_texteditor/app_texteditor.h"
