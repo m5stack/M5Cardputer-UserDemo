@@ -118,6 +118,7 @@ extern "C" void app_main(void)
     mooncake.installApp(new APPS::AppTimer_Packer);
     mooncake.installApp(new APPS::AppKeyboard_Packer);
     mooncake.installApp(new APPS::AppTextEditor_Packer);
+    mooncake.installApp(new APPS::AppHello_Packer);
 
     // Create launcher 
     mooncake.createApp(launcher);
