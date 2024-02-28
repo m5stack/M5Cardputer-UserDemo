@@ -6,9 +6,8 @@
  * @date 2024-02-27
  * 
  * @copyright Copyright (c) 2024
- * 
  */
-//#pragma once
+
 #include <mooncake.h>
 #include "../../hal/hal.h"
 #include "../utils/theme/theme_define.h"
@@ -17,7 +16,6 @@
 
 #include "assets/hello_big.h"
 #include "assets/hello_small.h"
-
 
 namespace MOONCAKE
 {
@@ -29,22 +27,9 @@ namespace MOONCAKE
                 struct Data_t
                 {
                     HAL::Hal* hal = nullptr;
-
-//                    int last_key_num = 0;
-//                    char string_buffer[100];
-//                    std::string repl_input_buffer;
-//                    bool is_caps = false;
-//                    char* value_buffer = nullptr;
-//
-//                    uint32_t cursor_update_time_count = 0;
-//                    uint32_t cursor_update_period = 500;
-//                    bool cursor_state = false;
                 };
                 Data_t _data;
-//                void _update_input();
-//                void _update_cursor();
-//                void _update_input_panel();
-//                void _update_receive();
+                void _display_helloworld();
 
             public:
                 void onCreate() override;
