@@ -255,7 +255,7 @@ void Launcher::_port_update_system_state()
     else 
     {
         // Fake time 
-        snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", millis() / 3600000, millis() / 60000);
+        snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", (millis() / 3600000) % 60, (millis() / 60000) % 60)
     }
     _data.system_state.time = _data.string_buffer;
     // spdlog::info("time: {}", _data.system_state.time);
