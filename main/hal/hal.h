@@ -9,7 +9,7 @@
  *
  */
 #pragma once
-#include "../../components/LovyanGFX/src/LovyanGFX.hpp"
+#include <M5GFX.h>
 #include "keyboard/keyboard.h"
 #include "mic/Mic_Class.hpp"
 #include "speaker/Speaker_Class.hpp"

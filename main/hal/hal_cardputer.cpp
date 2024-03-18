@@ -23,7 +23,8 @@ void HalCardputer::_display_init()
     spdlog::info("init display");
 
     // Display 
-    _display = new LGFX_Cardputer;
+    // _display = new LGFX_Cardputer;
+    _display = new M5GFX;
     _display->init();
     _display->setRotation(1);
 
