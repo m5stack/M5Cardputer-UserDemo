@@ -1,27 +1,24 @@
 /**
  * @file port.cpp
  * @author Forairaaaaa
- * @brief 
+ * @brief
  * @version 0.1
  * @date 2023-09-18
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include "../launcher.h"
 #include "../../utils/common_define.h"
 #include "../../utils/boot_sound/boot_sound_1.h"
 #include "../../utils/boot_sound/boot_sound_2.h"
 
-
 // #define NO_BOOT_PLAY_SHIT
-
 
 using namespace MOONCAKE::APPS;
 
-
 void Launcher::_port_wait_enter()
-{   
+{
     // delay(600);
 
     _data.hal->Speaker()->setVolume(255);
@@ -34,17 +31,16 @@ void Launcher::_port_wait_enter()
     }
     else
     {
-        // shit = true;
-        #ifndef NO_BOOT_PLAY_SHIT
+// shit = true;
+#ifndef NO_BOOT_PLAY_SHIT
         _data.hal->Speaker()->playWav(boot_sound_2, sizeof(boot_sound_2));
-        #endif
+#endif
     }
 
-    // Hold till release 
+    // Hold till release
     while (_data.hal->keyboard()->keyList().size())
         _data.hal->keyboard()->updateKeyList();
 
-    
     while (1)
     {
         _data.hal->keyboard()->updateKeyList();
@@ -52,7 +48,7 @@ void Launcher::_port_wait_enter()
         {
             _data.hal->playNextSound();
 
-            // Hold till release 
+            // Hold till release
             while (_data.hal->keyboard()->keyList().size())
                 _data.hal->keyboard()->updateKeyList();
 
@@ -66,8 +62,7 @@ void Launcher::_port_wait_enter()
     //     _data.hal->Speaker()->playWav(boot_sound_2, sizeof(boot_sound_2));
     // else
     //     _data.hal->Speaker()->playWav(boot_sound_1, sizeof(boot_sound_1));
-}   
-
+}
 
 bool Launcher::_port_check_next_pressed()
 {
@@ -75,7 +70,7 @@ bool Launcher::_port_check_next_pressed()
     {
         // _data.hal->playNextSound();
 
-        // Hold till release 
+        // Hold till release
         while (_data.hal->keyboard()->isKeyPressing(55) || _data.hal->keyboard()->isKeyPressing(54))
         {
             _data.menu->update(millis());
@@ -85,10 +80,9 @@ bool Launcher::_port_check_next_pressed()
 
         return true;
     }
-    
+
     return false;
 }
-
 
 bool Launcher::_port_check_last_pressed()
 {
@@ -96,7 +90,7 @@ bool Launcher::_port_check_last_pressed()
     {
         // _data.hal->playLastSound();
 
-        // Hold till release 
+        // Hold till release
         while (_data.hal->keyboard()->isKeyPressing(53) || _data.hal->keyboard()->isKeyPressing(40))
         {
             _data.menu->update(millis());
@@ -106,10 +100,9 @@ bool Launcher::_port_check_last_pressed()
 
         return true;
     }
-    
+
     return false;
 }
-
 
 bool Launcher::_port_check_enter_pressed()
 {
@@ -117,7 +110,7 @@ bool Launcher::_port_check_enter_pressed()
     {
         // _data.hal->playNextSound();
 
-        // Hold till release 
+        // Hold till release
         while (_data.hal->keyboard()->isKeyPressing(42))
         {
             _data.menu->update(millis());
@@ -127,10 +120,9 @@ bool Launcher::_port_check_enter_pressed()
 
         return true;
     }
-    
+
     return false;
 }
-
 
 static int _last_key_num = 0;
 static bool _last_caps_lock_state = false;
@@ -139,41 +131,41 @@ static bool _is_special_key_pressed = false;
 
 void Launcher::_port_update_keyboard_state()
 {
-    // Update key list 
+    // Update key list
     _data.hal->keyboard()->updateKeyList();
     _data.hal->keyboard()->updateKeysState();
 
-    // Check double clicked lock shit 
-    // If (last 1 && now 0), a clicked 
-    // spdlog::info("{} {} {}", _last_caps_lock_state, _data.hal->keyboard()->keysState().shift, _last_caps_lock_state && !_data.hal->keyboard()->keysState().shift);
+    // Check double clicked lock shit
+    // If (last 1 && now 0), a clicked
+    // spdlog::info("{} {} {}", _last_caps_lock_state, _data.hal->keyboard()->keysState().shift, _last_caps_lock_state &&
+    // !_data.hal->keyboard()->keysState().shift);
     if (_last_caps_lock_state && !_data.hal->keyboard()->keysState().shift)
     {
         // spdlog::info("clicked");
-        // Check interval to last clicked 
+        // Check interval to last clicked
         if ((millis() - _last_caps_lock_click_time) < 500)
         {
             // spdlog::info("double clicked");
-            // Toggle state 
+            // Toggle state
             _data.hal->keyboard()->setCapsLocked(!_data.hal->keyboard()->capslocked());
 
             spdlog::info("caps lock: {}", _data.hal->keyboard()->capslocked());
-            
-            // Avoid trple clicked liked shit 
+
+            // Avoid trple clicked liked shit
             _last_caps_lock_click_time = 0;
         }
-        else 
+        else
         {
             _last_caps_lock_click_time = millis();
         }
     }
 
-    
-    // Reset state 
+    // Reset state
     _data.keybaord_state.reset();
     _last_caps_lock_state = false;
     _is_special_key_pressed = false;
 
-    // Keyboard bar icon shit 
+    // Keyboard bar icon shit
     if (_data.hal->keyboard()->keyList().size())
     {
         // _data.hal->keyboard()->updateKeysState();
@@ -188,7 +180,7 @@ void Launcher::_port_update_keyboard_state()
             _data.keybaord_state.fn = true;
             _is_special_key_pressed = true;
         }
-            
+
         if (_data.hal->keyboard()->keysState().ctrl)
         {
             _data.keybaord_state.ctrl = true;
@@ -210,28 +202,24 @@ void Launcher::_port_update_keyboard_state()
         _data.keybaord_state.caps_lock = true;
     }
 
-
-    // Key sound shit 
+    // Key sound shit
     if (_data.hal->keyboard()->keyList().size() != _last_key_num)
     {
         if (_data.hal->keyboard()->keyList().size() == 0)
             _data.hal->playLastSound();
-        else 
+        else
         {
             if (_is_special_key_pressed)
                 _data.hal->playKeyboardSound();
-            else 
+            else
                 _data.hal->playNextSound();
         }
-        
+
         _last_key_num = _data.hal->keyboard()->keyList().size();
     }
 }
 
-
-
 uint32_t _bat_update_time_count = 0;
-
 
 void Launcher::_port_update_system_state()
 {
@@ -239,9 +227,7 @@ void Launcher::_port_update_system_state()
     // _data.system_state.bat_state = 2;
     // _data.system_state.time = "22:33";
 
-
-
-    // Time shit 
+    // Time shit
     if (_data.hal->isSntpAdjusted())
     {
         static time_t now;
@@ -252,17 +238,19 @@ void Launcher::_port_update_system_state()
         // spdlog::info("{} {}", timeinfo.tm_hour, timeinfo.tm_min);
         snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
     }
-    else 
+    else
     {
-        // Fake time 
-        snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld", (millis() / 3600000) % 60, (millis() / 60000) % 60)
+        // Fake time
+        snprintf(_data.string_buffer,
+                 sizeof(_data.string_buffer),
+                 "%02lld:%02lld",
+                 (millis() / 3600000) % 60,
+                 (millis() / 60000) % 60);
     }
     _data.system_state.time = _data.string_buffer;
     // spdlog::info("time: {}", _data.system_state.time);
 
-
-    
-    // Bat shit 
+    // Bat shit
     if ((millis() - _bat_update_time_count) > 5000 || _bat_update_time_count == 0)
     {
         auto bat_level = _data.hal->getBatLevel();
@@ -288,5 +276,4 @@ void Launcher::_port_update_system_state()
 
         _bat_update_time_count = millis();
     }
-
 }
