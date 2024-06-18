@@ -68,7 +68,7 @@ void AppTimer::onRunning()
             _data.hal->canvas()->setTextSize(1);
             _data.hal->canvas()->print("System Time");
 
-            snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld:%02lld", millis() / 3600000, millis() / 60000, (millis() / 1000) % 60);
+            snprintf(_data.string_buffer, sizeof(_data.string_buffer), "%02lld:%02lld:%02lld", (millis() / 3600000) % 60, (millis() / 60000) % 60, (millis() / 1000) % 60);
             
             _data.hal->canvas()->setTextSize(2);
             _data.hal->canvas()->drawCenterString(_data.string_buffer, _data.hal->canvas()->width() / 2, _data.hal->canvas()->height() / 2 - 10);
