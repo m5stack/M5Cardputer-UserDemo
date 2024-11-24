@@ -18,9 +18,9 @@
 #include "sdmmc_cmd.h"
 #include "sdcard.h"
 
-#define PIN_NUM_MISO 39
-#define PIN_NUM_MOSI 14
-#define PIN_NUM_CLK  40
+#define PIN_NUM_MISO GPIO_NUM_39
+#define PIN_NUM_MOSI GPIO_NUM_14
+#define PIN_NUM_CLK  GPIO_NUM_40
 #define PIN_NUM_CS   GPIO_NUM_12
 
 static const char *MOUNT_POINT = "/sdcard";
@@ -34,7 +34,7 @@ bool SDCard::mount(bool format_if_mount_failed) {
     esp_err_t ret;
     ESP_LOGI(TAG, "Initializing SD card");
 
-    sdmmc_host_t host = SDSPI_HOST_DEFAULT();
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT(); 
     spi_bus_config_t bus_cfg;
     bus_cfg.mosi_io_num = PIN_NUM_MOSI;
     bus_cfg.miso_io_num = PIN_NUM_MISO;
@@ -49,7 +49,7 @@ bool SDCard::mount(bool format_if_mount_failed) {
     bus_cfg.flags = (SPICOMMON_BUSFLAG_SCLK | SPICOMMON_BUSFLAG_MOSI);
     bus_cfg.intr_flags = 0; 
 
-    ret = spi_bus_initialize(SPI3_HOST, &bus_cfg, SDSPI_DEFAULT_DMA);
+    ret = spi_bus_initialize((spi_host_device_t)host.slot, &bus_cfg, SDSPI_DEFAULT_DMA);
     if (ret != ESP_OK) {
         ESP_LOGE(TAG, "Failed to initialize bus.");
         return false;
@@ -57,7 +57,7 @@ bool SDCard::mount(bool format_if_mount_failed) {
 
     sdspi_device_config_t slot_config = SDSPI_DEVICE_CONFIG_DEFAULT();
     slot_config.gpio_cs = PIN_NUM_CS;
-    slot_config.host_id = SPI3_HOST;
+    slot_config.host_id = (spi_host_device_t)host.slot;
 
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
         .format_if_mount_failed = format_if_mount_failed,
@@ -68,7 +68,7 @@ bool SDCard::mount(bool format_if_mount_failed) {
     ret = esp_vfs_fat_sdspi_mount(MOUNT_POINT, &host, &slot_config, &mount_config, &card);
     if (ret != ESP_OK) {
         card = nullptr;
-        spi_bus_free(SPI3_HOST);
+        spi_bus_free((spi_host_device_t)host.slot);
         ESP_LOGE(TAG, "Failed to mount filesystem.");
         return false;
     }
@@ -89,7 +89,8 @@ bool SDCard::eject() {
         return false;
     }
     card = nullptr;
-    spi_bus_free(SPI3_HOST);
+    sdmmc_host_t host = SDSPI_HOST_DEFAULT(); 
+    spi_bus_free((spi_host_device_t)host.slot);
     ESP_LOGI(TAG, "Card unmounted and SPI bus freed");
     mounted = false;
     return true;
