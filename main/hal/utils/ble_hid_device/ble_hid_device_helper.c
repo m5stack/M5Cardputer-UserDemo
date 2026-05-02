@@ -20,6 +20,7 @@
 #include "esp_log.h"
 #include "nvs_flash.h"
 #include "esp_bt.h"
+#include "esp_mac.h"
 
 #if CONFIG_BT_NIMBLE_ENABLED
 #include "host/ble_hs.h"
@@ -44,6 +45,7 @@
 
 #if CONFIG_BT_NIMBLE_ENABLED
 #include "services/bas/ble_svc_bas.h"
+#include "services/gap/ble_svc_gap.h"
 #endif
 
 static const char *TAG = "ble_hid";
@@ -381,7 +383,8 @@ static esp_hid_device_config_t ble_hid_config = {.vendor_id  = 0x16C0,
                                                  .product_id = 0x05DF,
                                                  .version    = 0x0100,
 #if CONFIG_EXAMPLE_HID_DEVICE_ROLE == 2
-                                                 .device_name = "CardputerADV",
+                                                 // 10 chars + " " + 4 bytes MAC ID
+                                                 .device_name = "CP-ADV Kbd",
 #elif CONFIG_EXAMPLE_HID_DEVICE_ROLE == 3
                                                  .device_name = "ESP Mouse",
 #else
@@ -919,6 +922,9 @@ void ble_store_config_init(void);
 void _demo_app_main(void)
 {
     esp_err_t ret;
+    uint8_t mac[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
+    char device_name[16]; // max 15 usable chars for advertisement
+
 #if HID_DEV_MODE == HIDD_IDLE_MODE
     ESP_LOGE(TAG, "Please turn on BT HID device or BLE!");
     return;
@@ -934,13 +940,22 @@ void _demo_app_main(void)
     ret = esp_hid_gap_init(HID_DEV_MODE);
     ESP_ERROR_CHECK(ret);
 
+    // Add unique ID to the device name.
+    esp_efuse_mac_get_default(mac);
+    snprintf(device_name, sizeof(device_name), "%s %02hhX%02hhX",
+            ble_hid_config.device_name, mac[4], mac[5]);
+
+#if CONFIG_BT_NIMBLE_ENABLED
+    ESP_LOGI(TAG, "setting device name");
+    ble_svc_gap_device_name_set(device_name); // overwrites CONFIG_BT_NIMBLE_SVC_GAP_DEVICE_NAME
+#endif
 #if CONFIG_BT_BLE_ENABLED || CONFIG_BT_NIMBLE_ENABLED
 #if CONFIG_EXAMPLE_HID_DEVICE_ROLE == 2
-    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_KEYBOARD, ble_hid_config.device_name);
+    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_KEYBOARD, device_name);
 #elif CONFIG_EXAMPLE_HID_DEVICE_ROLE == 3
-    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_MOUSE, ble_hid_config.device_name);
+    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_MOUSE, device_name);
 #else
-    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_GENERIC, ble_hid_config.device_name);
+    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_GENERIC, device_name);
 #endif
     ESP_ERROR_CHECK(ret);
 #if CONFIG_BT_BLE_ENABLED
@@ -956,7 +971,7 @@ void _demo_app_main(void)
 
 #if CONFIG_BT_HID_DEVICE_ENABLED
     ESP_LOGI(TAG, "setting device name");
-    esp_bt_gap_set_device_name(bt_hid_config.device_name);
+    esp_bt_gap_set_device_name(device_name);
     ESP_LOGI(TAG, "setting cod major, peripheral");
     esp_bt_cod_t cod = {0};
     cod.major        = ESP_BT_COD_MAJOR_DEV_PERIPHERAL;
