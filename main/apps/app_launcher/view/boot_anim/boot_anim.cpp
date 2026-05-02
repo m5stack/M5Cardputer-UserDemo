@@ -60,7 +60,8 @@ void Launcher::boot_anim()
     GetHAL().display.fillRect(195, 113, 40, 19, (uint32_t)0xE6E6E6);
     GetHAL().display.setFont(&fonts::efontCN_16);
     GetHAL().display.setTextColor((uint32_t)0x999999);
-    GetHAL().display.drawString(FW_VERSION, 201, 109);
+    int textWidth = GetHAL().display.textWidth(FW_VERSION);
+    GetHAL().display.drawString(FW_VERSION, 235 - textWidth, 115);
 
     // Play sfx
 #ifndef NO_BOOT_PLAY
