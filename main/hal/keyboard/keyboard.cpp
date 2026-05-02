@@ -73,7 +73,7 @@ void Keyboard::update()
 
     update_modifier_mask(_key_event_raw_buffer);
     _key_event_buffer = convertToKeyEvent(_key_event_raw_buffer);
-    // mclog::tagDebug(_tag, "key event: ({}) {} {}", (int)_key_event_buffer.code, _key_event_buffer.name,
+    // mclog::tagDebug(_tag, "key event: ({}) {} {}", (int)_key_event_buffer.keyCode, _key_event_buffer.keyName,
     //                 _key_event_buffer.state);
     onKeyEvent.emit(_key_event_buffer);
 }
