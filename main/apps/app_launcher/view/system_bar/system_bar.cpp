@@ -36,12 +36,17 @@ void Launcher::render_system_bar()
     // Update state
     _data.system_state.wifi_state = GetHAL().isWifiConnected() ? 1 : 4;
 
-    // Time
-    static time_t now;
-    static struct tm timeinfo;
-    time(&now);
-    localtime_r(&now, &timeinfo);
-    _data.system_state.time = fmt::format("{:02d}:{:02d}", timeinfo.tm_hour, timeinfo.tm_min);
+    // Show wall clock once SNTP has synced, otherwise show uptime.
+    if (GetHAL().isTimeSynced()) {
+        static time_t now;
+        static struct tm timeinfo;
+        time(&now);
+        localtime_r(&now, &timeinfo);
+        _data.system_state.time = fmt::format("{:02d}:{:02d} UTC", timeinfo.tm_hour, timeinfo.tm_min);
+    } else {
+        uint32_t mins = GetHAL().millis() / 60000;
+        _data.system_state.time = fmt::format("up {}:{:02d}", mins / 60, mins % 60);
+    }
 
     // Bat
     if ((GetHAL().millis() - _data.bat_update_time_count) > 5000 || _data.bat_update_time_count == 0) {

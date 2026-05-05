@@ -363,8 +363,8 @@ void Hal::start_sntp()
         return;
     }
 
-    // Set timezone to UTC+8
-    setenv("TZ", "CST-8", 1);
+    // Set timezone to UTC (we don't know where this device is)
+    setenv("TZ", "UTC0", 1);
     tzset();
 
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);

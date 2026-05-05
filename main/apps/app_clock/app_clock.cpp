@@ -61,8 +61,8 @@ void AppClock::render_interface()
 
 void AppClock::update_time_display()
 {
-    // Check WiFi connection status instead of SNTP adjustment
-    if (GetHAL().isWifiConnected()) {
+    // We have proper time if we had a WiFi connection
+    if (GetHAL().isTimeSynced()) {
         show_network_time();
     } else {
         show_system_time();
