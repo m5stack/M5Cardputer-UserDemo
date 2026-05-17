@@ -11,8 +11,11 @@
 #include <hal/hal.h>
 #include <mooncake_log.h>
 #include <random>
+#include "audio.h"
 
 namespace audio {
+
+static bool quiet_mode_is_enabled = false;
 
 static std::vector<int> c_major_scale = {60, 62, 64, 65, 67, 69, 71};  // C大调音阶（C D E F G A B）
 
@@ -46,7 +49,7 @@ void play_tone(int frequency, double durationSec)
     GetHAL().speaker.playRaw(buffer.data(), buffer.size());
 }
 
-void play_melody(const std::vector<int>& midiList, double durationSec = 0.1)
+void play_melody(const std::vector<int>& midiList, double durationSec)
 {
     if (GetHAL().speaker.getVolume() <= 0) {
         return;
@@ -94,9 +97,10 @@ void play_tone_from_midi(int midi, double durationSec)
     play_tone(static_cast<int>(freq), durationSec);
 }
 
-void play_random_tone(int semitoneShift = 0, double durationSec = 0.15)
+void play_random_tone(int semitoneShift, double durationSec)
 {
-    if (GetHAL().speaker.getVolume() <= 0) {
+    // No random sounds during quiet mode
+    if (GetHAL().speaker.getVolume() <= 0 || is_quiet_mode()) {
         return;
     }
 
@@ -115,11 +119,12 @@ void play_random_tone(int semitoneShift = 0, double durationSec = 0.15)
 /* -------------------------------------------------------------------------- */
 static void _keyboard_sfx_on_key_event(const Keyboard::KeyEvent_t& event)
 {
-    if (!event.state) {
+    // No keypress sounds during quiet mode
+    if (!event.state || is_quiet_mode()) {
         return;
     }
 
-    GetHAL().speaker.setVolume(90);
+    GetHAL().speaker.setVolume(DEFAULT_VOLUME);
 
     int semitoneShift = 48;
     switch (event.keyCode) {
@@ -168,6 +173,16 @@ void set_keyboard_sfx_enable(bool enable)
         is_enabled = false;
         GetHAL().keyboard.onKeyEvent.disconnect(slot_id);
     }
+}
+
+bool is_quiet_mode()
+{
+    return quiet_mode_is_enabled;
+}
+
+void set_quiet_mode(bool quiet)
+{
+    quiet_mode_is_enabled = quiet;
 }
 
 }  // namespace audio

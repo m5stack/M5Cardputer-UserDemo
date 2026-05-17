@@ -88,10 +88,13 @@ void AppKeyboard::onClose()
 
     if (_is_keyboard_active) {
         // The best way to release everything
+        // Unfortunately, a side-effect is that in-memory counters and
+        // settings all get lost
         esp_restart();
-    } else {
-        close();
+        __builtin_unreachable();
     }
+
+    close();
 }
 
 void AppKeyboard::select_keyboard_type()

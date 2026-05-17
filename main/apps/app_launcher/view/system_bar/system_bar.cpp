@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: MIT
  */
 #include "../../app_launcher.h"
+#include <apps/utils/audio/audio.h>
 #include <mooncake_log.h>
 #include <apps/utils/theme.h>
 #include <apps/utils/common.h>
@@ -12,6 +13,7 @@
 #include "assets/bat2.h"
 #include "assets/bat3.h"
 #include "assets/bat4.h"
+#include "assets/quiet.h"
 #include "assets/wifi1.h"
 #include "assets/wifi2.h"
 #include "assets/wifi3.h"
@@ -94,6 +96,11 @@ void Launcher::render_system_bar()
         GetHAL().canvasSystemBar.pushImage(x, y, 16, 16, image_data_wifi4);
     } else if (_data.system_state.wifi_state == 5) {
         GetHAL().canvasSystemBar.pushImage(x, y, 16, 16, image_data_wifi5);
+    }
+
+    // Silence indicator (quiet mode)
+    if (audio::is_quiet_mode()) {
+        GetHAL().canvasSystemBar.pushImage(x + 18, y, 16, 16, image_data_quiet);
     }
 
     // Bat icon

@@ -75,7 +75,7 @@ void AppRecord::onClose()
     // Cleanup audio devices
     GetHAL().mic.end();
     GetHAL().speaker.begin();
-    GetHAL().speaker.setVolume(255);
+    GetHAL().speaker.setVolume(audio::DEFAULT_VOLUME);
 
     // Free memory
     if (_rec_data) {

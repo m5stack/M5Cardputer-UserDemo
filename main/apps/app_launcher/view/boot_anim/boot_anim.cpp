@@ -46,6 +46,9 @@ void Launcher::boot_anim()
 
     // GetHAL().delay(300);  // Codec init takes some time
 
+    // Restore quiet mode preference before playing anything
+    audio::set_quiet_mode(GetHAL().getSettings().GetBool("quiet_mode", false));
+
     // If software restart
     if (esp_reset_reason() != ESP_RST_POWERON) {
         mclog::tagInfo(getAppInfo().name, "not power on reset, skip boot anim");
@@ -57,7 +60,6 @@ void Launcher::boot_anim()
 
     // Show boot image
     GetHAL().display.pushImage(0, 0, 240, 135, image_data_logo);
-    GetHAL().display.fillRect(195, 113, 40, 19, (uint32_t)0xE6E6E6);
     GetHAL().display.setFont(&fonts::efontCN_16);
     GetHAL().display.setTextColor((uint32_t)0x999999);
     int textWidth = GetHAL().display.textWidth(FW_VERSION);
@@ -65,8 +67,10 @@ void Launcher::boot_anim()
 
     // Play sfx
 #ifndef NO_BOOT_PLAY
-    GetHAL().speaker.setVolume(255);
-    GetHAL().speaker.playWav(boot_sfx, sizeof(boot_sfx));
+    if (!audio::is_quiet_mode()) {
+        GetHAL().speaker.setVolume(audio::DEFAULT_VOLUME);
+        GetHAL().speaker.playWav(boot_sfx, sizeof(boot_sfx));
+    }
 #endif
 
     // Wait enter
@@ -77,7 +81,7 @@ void Launcher::boot_anim()
         GetHAL().update();
 
         if (GetHAL().homeButton.wasPressed()) {
-            GetHAL().speaker.setVolume(90);
+            GetHAL().speaker.setVolume(audio::DEFAULT_VOLUME);
             audio::play_random_tone();
             break;
         }
@@ -93,6 +97,19 @@ void Launcher::boot_anim()
                 while (1) {
                     start_arkanoid();
                 }
+            }
+
+        } else if (!key_event.state && key_event.keyCode == KEY_Q) {
+            // During the boot screen, Q can only enable quiet mode
+            if (!audio::is_quiet_mode()) {
+                audio::set_quiet_mode(true);
+                GetHAL().getSettings().SetBool("quiet_mode", true);
+            }
+            if (egg_count) {
+                // Propagate quiet mode to elsewhere
+                egg_count--;
+            } else {
+                break;
             }
 
         } else if (!key_event.state && key_event.keyCode != KEY_NONE) {
