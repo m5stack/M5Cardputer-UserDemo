@@ -5,6 +5,7 @@
  */
 #include "menu.h"
 #include "../../app_launcher.h"
+#include <apps/utils/audio/audio.h>
 #include <apps/utils/theme.h>
 #include <apps/utils/common.h>
 #include <mooncake_log.h>
@@ -78,6 +79,12 @@ void LauncherMenu::onReadInput()
         // Enter
         else if (event.row == 2 && event.col == 13) {
             press(getSelectedKeyframe());
+        }
+        // Q -- toggle quiet mode (KEY_Q)
+        else if (event.row == 1 && event.col == 1) {
+            bool new_quiet = !audio::is_quiet_mode();
+            audio::set_quiet_mode(new_quiet);
+            GetHAL().getSettings().SetBool("quiet_mode", new_quiet);
         }
     }
     // Key released
