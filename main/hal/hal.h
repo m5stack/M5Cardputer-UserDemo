@@ -77,6 +77,16 @@ public:
     }
     void wifiDisconnect();
 
+    /* ---------------------------------- Time ---------------------------------- */
+    bool isTimeSynced() const
+    {
+        // Time code in HAL because the clock is technically in hardware. And the
+        // WiFi components set it. Don't check esp_sntp_get_sync_status() because
+        // we're not continuously syncing.
+        constexpr time_t t2026 = 1767225600;  // "2026-01-01T00:00Z"
+        return time(NULL) > t2026;
+    }
+
     /* --------------------------------- EspNow --------------------------------- */
     void espNowInit();
     void espNowDeinit();
