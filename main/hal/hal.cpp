@@ -726,7 +726,8 @@ void Hal::sd_card_init()
 
     // Options for mounting the filesystem
     esp_vfs_fat_sdmmc_mount_config_t mount_config = {
-        .format_if_mount_failed = false, .max_files = 5, .allocation_unit_size = 16 * 1024};
+        .format_if_mount_failed = false, .max_files = 5, .allocation_unit_size = 16 * 1024,
+        .disk_status_check_enable = false, .use_one_fat = false};
 
     const char mount_point[] = MOUNT_POINT;
     mclog::tagInfo(_tag, "initializing SD card");

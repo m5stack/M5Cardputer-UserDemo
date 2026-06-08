@@ -72,10 +72,10 @@ struct ArkanoidData_t {
     bool gameOver = false;
     bool pause    = false;
 
-    Player player                                 = {0};
-    Ball ball                                     = {0};
-    Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = {0};
-    Vector2 brickSize                             = {0};
+    Player player                                 = {};
+    Ball ball                                     = {};
+    Brick brick[LINES_OF_BRICKS][BRICKS_PER_LINE] = {};
+    Vector2 brickSize                             = {};
 
     bool key_left_state  = false;
     bool key_right_state = false;

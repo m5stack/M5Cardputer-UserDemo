@@ -25,7 +25,7 @@ void Launcher::start_system_bar()
 
 void Launcher::update_system_bar()
 {
-    if ((GetHAL().millis() - _data.system_bar_update_count) > _data.system_bar_update_preiod) {
+    if ((GetHAL().millis() - _data.system_bar_update_count) > _data.system_bar_update_period) {
         render_system_bar();
         _data.system_bar_update_count = GetHAL().millis();
     }

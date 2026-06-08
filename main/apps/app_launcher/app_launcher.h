@@ -45,12 +45,8 @@ private:
     };
 
     struct Data_t {
-        // Menu
-        uint32_t menu_update_preiod = 10;
-        uint32_t menu_update_count  = 0;
-
         // System bar
-        uint32_t system_bar_update_preiod = 1000;
+        uint32_t system_bar_update_period = 1000;
         uint32_t system_bar_update_count  = 0;
         uint32_t bat_update_time_count    = 0;
         SystemState_t system_state;

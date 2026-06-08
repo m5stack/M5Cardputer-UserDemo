@@ -100,6 +100,7 @@ typedef enum {
 #define DISTANCE_MAX 125
 #define DELTA_SCALAR 5
 
+#if 0
 static void mouse_draw_square_next_delta(int8_t *delta_x_ret, int8_t *delta_y_ret)
 {
     static mouse_dir_t cur_dir = MOUSE_DIR_RIGHT;
@@ -152,6 +153,7 @@ static void app_send_hid_demo(void)
         vTaskDelay(pdMS_TO_TICKS(20));
     }
 }
+#endif
 
 static void _demo_app_main(void)
 {
