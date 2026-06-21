@@ -222,6 +222,7 @@ void Keyboard::updateKeysState()
         if (strcmp(getKeyValue(i).value_first, "tab") == 0)
         {
             _keys_state_buffer.tab = true;
+            _keys_state_buffer.hidKey.push_back(KEY_TAB);
             continue;
         }
 
@@ -257,31 +258,62 @@ void Keyboard::updateKeysState()
         if (strcmp(getKeyValue(i).value_first, "del") == 0)
         {
             _keys_state_buffer.del = true;
-            _keys_state_buffer.hidKey.push_back(KEY_BACKSPACE);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "enter") == 0)
         {
             _keys_state_buffer.enter = true;
-            _keys_state_buffer.hidKey.push_back(KEY_ENTER);
             continue;
         }
 
         if (strcmp(getKeyValue(i).value_first, "space") == 0)
         {
             _keys_state_buffer.space = true;
-            _keys_state_buffer.hidKey.push_back(KEY_SPACE);
             continue;
         } 
 
         _key_values_without_special_keys.push_back(i);
     }
 
+    // two special keys combination handling
+    if (_keys_state_buffer.del)
+    {
+        if (_keys_state_buffer.fn)
+            _keys_state_buffer.hidKey.push_back(KEY_DELETE);
+        else
+            _keys_state_buffer.hidKey.push_back(KEY_BACKSPACE);
+    }
+    if (_keys_state_buffer.enter)
+    {
+        if (_keys_state_buffer.fn)
+            _keys_state_buffer.hidKey.push_back(KEY_PAGEUP);
+        else
+            _keys_state_buffer.hidKey.push_back(KEY_ENTER);
+    }
+    if (_keys_state_buffer.space)
+    {
+        if (_keys_state_buffer.fn)
+            _keys_state_buffer.hidKey.push_back(KEY_PAGEDOWN);
+        else
+            _keys_state_buffer.hidKey.push_back(KEY_SPACE);
+    }
+    if (_keys_state_buffer.shift && _keys_state_buffer.fn)
+    {
+        _keys_state_buffer.hidKey.push_back(KEY_CAPSLOCK);
+    }
+
     // Deal what left
     for (auto& i : _key_values_without_special_keys)
     {
-        if (_keys_state_buffer.ctrl || _keys_state_buffer.shift || _is_caps_locked)
+        if (_keys_state_buffer.fn)
+        {
+            auto hidKey = getKeyValue(i).value_num_third;
+            if (hidKey == KEY_PAUSE) // Ctrl+Break
+                _keys_state_buffer.ctrl = true;
+            _keys_state_buffer.hidKey.push_back(hidKey);
+        }
+        else if (_keys_state_buffer.ctrl || _keys_state_buffer.shift || _is_caps_locked)
         {
             _keys_state_buffer.values.push_back(*getKeyValue(i).value_second);
             _keys_state_buffer.hidKey.push_back(getKeyValue(i).value_num_second);
