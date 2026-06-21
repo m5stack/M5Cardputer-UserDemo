@@ -342,7 +342,7 @@ void ble_keyboard_wrap_init(KEYBOARD::Keyboard* keyboard) {
     ret = esp_hid_gap_init(HID_DEV_MODE);
     ESP_ERROR_CHECK(ret);
 
-    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_GENERIC,
+    ret = esp_hid_ble_gap_adv_init(ESP_HID_APPEARANCE_KEYBOARD,
                                    ble_hid_config.device_name);
     ESP_ERROR_CHECK(ret);
 
