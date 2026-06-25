@@ -96,7 +96,13 @@ void AppKeyboard::_ble_kb_update_kb_input()
                 if (status.alt) 
                 {
                     // ESP_LOGI(TAG, "ALT");
-                    modifier |= 0x03;
+                    modifier |= 0x04;
+                }
+
+                if (status.opt) 
+                {
+                    // ESP_LOGI(TAG, "WIN");
+                    modifier |= 0x08;
                 }
 
                 _input_buffer[0] = modifier;

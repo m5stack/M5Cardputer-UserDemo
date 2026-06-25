@@ -135,8 +135,7 @@
 #define KEY_INSERT     0x49  // Keyboard Insert
 #define KEY_HOME       0x4a  // Keyboard Home
 #define KEY_PAGEUP     0x4b  // Keyboard Page Up
-// #define KEY_DELETE 0x4c // Keyboard Delete Forward
-#define KEY_DELETE   0xD4  // Keyboard Delete Forward
+#define KEY_DELETE     0x4c  // Keyboard Delete Forward
 #define KEY_END      0x4d  // Keyboard End
 #define KEY_PAGEDOWN 0x4e  // Keyboard Page Down
 #define KEY_RIGHT    0x4f  // Keyboard Right Arrow
