@@ -367,9 +367,19 @@ void Hal::start_sntp()
     setenv("TZ", "UTC0", 1);
     tzset();
 
+    // Stop any previous session before configuring a fresh request.
+    esp_sntp_stop();
     esp_sntp_setoperatingmode(SNTP_OPMODE_POLL);
     esp_sntp_setservername(0, "pool.ntp.org");
+    sntp_set_sync_mode(SNTP_SYNC_MODE_IMMED);
+    sntp_set_time_sync_notification_cb(time_sync_notification_cb);
     esp_sntp_init();
+}
+
+void Hal::time_sync_notification_cb(struct timeval* tv)
+{
+    GetHAL()._is_time_synced.store(true);
+    ESP_LOGI("sntp", "Notification of a time synchronization event");
 }
 
 void Hal::stop_sntp()

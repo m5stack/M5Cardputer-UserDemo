@@ -10,9 +10,11 @@
 #include <M5Unified.hpp>
 #include <M5GFX.h>
 #include <memory>
+#include <atomic>
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <sys/time.h>
 
 class Hal {
 public:
@@ -80,11 +82,8 @@ public:
     /* ---------------------------------- Time ---------------------------------- */
     bool isTimeSynced() const
     {
-        // Time code in HAL because the clock is technically in hardware. And the
-        // WiFi components set it. Don't check esp_sntp_get_sync_status() because
-        // we're not continuously syncing.
-        constexpr time_t t2026 = 1767225600;  // "2026-01-01T00:00Z"
-        return time(NULL) > t2026;
+        // Keep the notification latched: the SNTP status getter clears COMPLETED.
+        return _is_time_synced.load();
     }
 
     /* --------------------------------- EspNow --------------------------------- */
@@ -135,6 +134,7 @@ public:
     CapLoRa868 capLora868;
 
 private:
+    std::atomic<bool> _is_time_synced{false};
     Settings* _settings             = nullptr;
     bool _is_wifi_inited            = false;
     bool _is_wifi_connected         = false;
@@ -152,6 +152,7 @@ private:
     void keyboard_init();
     void start_sntp();
     void stop_sntp();
+    static void time_sync_notification_cb(struct timeval* tv);
     void setting_init();
     void spi_init();
     void sd_card_init();
