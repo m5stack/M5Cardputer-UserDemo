@@ -9,12 +9,14 @@
  * 
  */
 #pragma once
+#include <stdbool.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-void sntp_warp_init(void);
+// Returns true only after a fresh SNTP response has updated the system clock.
+bool sntp_warp_init(void);
 
 
 #ifdef __cplusplus

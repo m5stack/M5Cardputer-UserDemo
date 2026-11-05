@@ -185,11 +185,11 @@ void AppSetWiFi::_update_state()
             _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
             _canvas_update();
 
-            sntp_warp_init();
-            _data.hal->setSntpAdjusted(true);
+            bool time_synced = sntp_warp_init();
+            _data.hal->setSntpAdjusted(time_synced);
 
-            _canvas->setTextColor(TFT_GREENYELLOW, THEME_COLOR_BG);
-            _canvas->printf("Done\n");
+            _canvas->setTextColor(time_synced ? TFT_GREENYELLOW : TFT_RED, THEME_COLOR_BG);
+            _canvas->printf(time_synced ? "Done\n" : "Time sync failed. Retry SetWiFi.\n");
             _canvas->setTextColor(THEME_COLOR_REPL_TEXT, THEME_COLOR_BG);
             _canvas->printf(">>> ");
             _canvas_update();
