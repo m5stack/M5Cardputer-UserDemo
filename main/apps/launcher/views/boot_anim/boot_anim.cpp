@@ -25,5 +25,8 @@ void Launcher::_boot_anim()
 
     // Show logo
     _data.hal->display()->pushImage(0, 0, 240, 135, image_data_logo);
+    _data.hal->display()->setFont(&fonts::Font0);
+    _data.hal->display()->setTextColor((uint32_t)0x999999, (uint32_t)0xE6E6E6);
+    _data.hal->display()->drawString("Q=quiet", 6, 122);
     _port_wait_enter();
 }

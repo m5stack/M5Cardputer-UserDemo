@@ -22,13 +22,36 @@ namespace HAL
             void _button_init();
             void _bat_init();
             void _sdcard_init();
+            void _load_quiet_mode();
 
         public:
             std::string type() override { return "cardputer"; }
             void init() override;
-            void playKeyboardSound() override { _speaker->setVolume(72); _speaker->tone(5000, 20); }
-            void playLastSound() override { _speaker->setVolume(32); _speaker->tone(6000, 20); }
-            void playNextSound() override { _speaker->setVolume(64); _speaker->tone(7000, 20); }
+            void setQuietMode(bool quiet) override;
+            void playKeyboardSound() override
+            {
+                if (!isQuietMode())
+                {
+                    _speaker->setVolume(72);
+                    _speaker->tone(5000, 20);
+                }
+            }
+            void playLastSound() override
+            {
+                if (!isQuietMode())
+                {
+                    _speaker->setVolume(32);
+                    _speaker->tone(6000, 20);
+                }
+            }
+            void playNextSound() override
+            {
+                if (!isQuietMode())
+                {
+                    _speaker->setVolume(64);
+                    _speaker->tone(7000, 20);
+                }
+            }
             uint8_t getBatLevel() override;
 
         public:

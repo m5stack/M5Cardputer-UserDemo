@@ -39,12 +39,13 @@ namespace HAL
         SDCard* _sdcard;
 
         bool _sntp_adjusted;
+        bool _quiet_mode;
 
     public:
         Hal()
             : _display(nullptr), _canvas(nullptr), _canvas_system_bar(nullptr), _canvas_keyboard_bar(nullptr),
               _keyboard(nullptr), _mic(nullptr), _speaker(nullptr), _homeButton(nullptr), _sdcard(nullptr),
-              _sntp_adjusted(false)
+              _sntp_adjusted(false), _quiet_mode(false)
         {
         }
 
@@ -61,6 +62,9 @@ namespace HAL
 
         inline void setSntpAdjusted(bool isAdjusted) { _sntp_adjusted = isAdjusted; }
         inline bool isSntpAdjusted(void) { return _sntp_adjusted; }
+
+        inline bool isQuietMode() const { return _quiet_mode; }
+        virtual void setQuietMode(bool quiet) { _quiet_mode = quiet; }
 
         // Canvas
         inline void canvas_system_bar_update() { _canvas_system_bar->pushSprite(_canvas_keyboard_bar->width(), 0); }

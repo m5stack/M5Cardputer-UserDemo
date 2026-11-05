@@ -21,10 +21,14 @@ void Launcher::_port_wait_enter()
 {
     // delay(600);
 
-    _data.hal->Speaker()->setVolume(255);
+    _data.hal->Speaker()->setVolume(90);
     // bool shit = false;
 
     _data.hal->keyboard()->updateKeyList();
+    const int quiet_key = _data.hal->keyboard()->getKeyNum({1, 1}); // Q
+    const bool quiet_pressed = _data.hal->keyboard()->isKeyPressing(quiet_key);
+    if (quiet_pressed)
+        _data.hal->setQuietMode(true);
     if (_data.hal->keyboard()->keyList().size())
     {
         // _data.hal->Speaker()->playWav(boot_sound_1, sizeof(boot_sound_1));
@@ -33,24 +37,36 @@ void Launcher::_port_wait_enter()
     {
 // shit = true;
 #ifndef NO_BOOT_PLAY_SHIT
-        _data.hal->Speaker()->playWav(boot_sound_2, sizeof(boot_sound_2));
+        if (!_data.hal->isQuietMode())
+            _data.hal->Speaker()->playWav(boot_sound_2, sizeof(boot_sound_2));
 #endif
     }
 
     // Hold till release
     while (_data.hal->keyboard()->keyList().size())
+    {
         _data.hal->keyboard()->updateKeyList();
+        delay(1);
+    }
+
+    if (quiet_pressed)
+        return;
 
     while (1)
     {
         _data.hal->keyboard()->updateKeyList();
         if (_data.hal->keyboard()->keyList().size())
         {
+            if (_data.hal->keyboard()->isKeyPressing(quiet_key))
+                _data.hal->setQuietMode(true);
             _data.hal->playNextSound();
 
             // Hold till release
             while (_data.hal->keyboard()->keyList().size())
+            {
                 _data.hal->keyboard()->updateKeyList();
+                delay(1);
+            }
 
             break;
         }
@@ -62,6 +78,15 @@ void Launcher::_port_wait_enter()
     //     _data.hal->Speaker()->playWav(boot_sound_2, sizeof(boot_sound_2));
     // else
     //     _data.hal->Speaker()->playWav(boot_sound_1, sizeof(boot_sound_1));
+}
+
+bool Launcher::_port_check_quiet_pressed()
+{
+    _data.hal->keyboard()->updateKeyList();
+    const bool pressed = _data.hal->keyboard()->isKeyPressing(_data.hal->keyboard()->getKeyNum({1, 1}));
+    const bool newly_pressed = pressed && !_data.quiet_key_was_pressed;
+    _data.quiet_key_was_pressed = pressed;
+    return newly_pressed;
 }
 
 bool Launcher::_port_check_next_pressed()

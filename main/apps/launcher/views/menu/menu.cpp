@@ -92,6 +92,13 @@ void Launcher::_update_menu()
 {
     if ((millis() - _data.menu_update_count) > _data.menu_update_preiod)
     {
+        if (_port_check_quiet_pressed())
+        {
+            _data.hal->setQuietMode(!_data.hal->isQuietMode());
+            _data.system_bar_update_count = millis() - _data.system_bar_update_preiod - 1;
+            _update_system_bar();
+        }
+
         // Navigate 
         if (_port_check_last_pressed())
             _data.menu->goLast();
