@@ -13,6 +13,8 @@
 #include <mooncake.h>
 #include "../apps/utils/common_define.h"
 #include "bat/adc_read.h"
+#include "nvs.h"
+#include "nvs_flash.h"
 
 using namespace HAL;
 
@@ -91,6 +93,59 @@ void HalCardputer::_bat_init() { adc_read_init(); }
 
 void HalCardputer::_sdcard_init() { _sdcard = new SDCard; }
 
+void HalCardputer::_load_quiet_mode()
+{
+    esp_err_t err = nvs_flash_init();
+    if (err != ESP_OK)
+    {
+        spdlog::warn("cannot initialize settings: {}", esp_err_to_name(err));
+        return;
+    }
+
+    nvs_handle_t handle;
+    err = nvs_open("cardputer", NVS_READONLY, &handle);
+    if (err == ESP_ERR_NVS_NOT_FOUND)
+        return;
+    if (err != ESP_OK)
+    {
+        spdlog::warn("cannot open settings: {}", esp_err_to_name(err));
+        return;
+    }
+
+    uint8_t quiet = 0;
+    err = nvs_get_u8(handle, "quiet_mode", &quiet);
+    nvs_close(handle);
+    if (err == ESP_OK)
+        _quiet_mode = quiet != 0;
+    else if (err != ESP_ERR_NVS_NOT_FOUND)
+        spdlog::warn("cannot load quiet mode: {}", esp_err_to_name(err));
+}
+
+void HalCardputer::setQuietMode(bool quiet)
+{
+    if (_quiet_mode == quiet)
+        return;
+
+    _quiet_mode = quiet;
+    if (quiet && _speaker)
+        _speaker->stop();
+
+    nvs_handle_t handle;
+    // Wi-Fi scanning may have deinitialized NVS since startup.
+    esp_err_t err = nvs_flash_init();
+    if (err == ESP_OK)
+        err = nvs_open("cardputer", NVS_READWRITE, &handle);
+    if (err == ESP_OK)
+    {
+        err = nvs_set_u8(handle, "quiet_mode", quiet);
+        if (err == ESP_OK)
+            err = nvs_commit(handle);
+        nvs_close(handle);
+    }
+    if (err != ESP_OK)
+        spdlog::warn("cannot save quiet mode: {}", esp_err_to_name(err));
+}
+
 void HalCardputer::init()
 {
     spdlog::info("hal init");
@@ -102,6 +157,7 @@ void HalCardputer::init()
     _button_init();
     _bat_init();
     _sdcard_init();
+    _load_quiet_mode();
 }
 
 // double getBatVolBfb(double batVcc) //获取电压的百分比，经过换算并非线性关系

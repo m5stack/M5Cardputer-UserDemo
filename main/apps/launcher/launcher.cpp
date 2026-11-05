@@ -40,6 +40,12 @@ void Launcher::onCreate()
     startApp();
 }
 
+void Launcher::onResume()
+{
+    // A Q held while returning from an app must not toggle quiet mode.
+    _data.hal->keyboard()->updateKeyList();
+    _data.quiet_key_was_pressed = _data.hal->keyboard()->isKeyPressing(_data.hal->keyboard()->getKeyNum({1, 1}));
+}
 
 void Launcher::onRunning()
 {

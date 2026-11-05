@@ -22,6 +22,7 @@
 #include "assets/wifi3.h"
 #include "assets/wifi4.h"
 #include "assets/wifi5.h"
+#include "assets/quiet.h"
 
 using namespace MOONCAKE::APPS;
 
@@ -79,10 +80,8 @@ void Launcher::_update_system_bar()
         else if (_data.system_state.wifi_state == 5)
             _data.hal->canvas_system_bar()->pushImage(x, y, 16, 16, image_data_wifi5);
 
-
-
-
-
+        if (_data.hal->isQuietMode())
+            _data.hal->canvas_system_bar()->pushImage(x + 18, y, 16, 16, image_data_quiet);
 
         // Bat shit 
         x = _data.hal->canvas_system_bar()->width() - 45;

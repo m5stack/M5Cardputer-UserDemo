@@ -68,6 +68,7 @@ namespace MOONCAKE
                 SMOOTH_MENU::Simple_Menu* menu = nullptr;
                 SMOOTH_MENU::SimpleMenuCallback_t* menu_render_cb = nullptr;
                 APP_BASE* _opened_app = nullptr;
+                bool quiet_key_was_pressed = false;
                 
                 // System bar
                 uint32_t system_bar_update_preiod = 1000;
@@ -98,12 +99,14 @@ namespace MOONCAKE
             bool _port_check_next_pressed();
             bool _port_check_last_pressed();
             bool _port_check_enter_pressed();
+            bool _port_check_quiet_pressed();
             void _port_update_keyboard_state();
             void _port_update_system_state();
         
 
         public:
             void onCreate() override;
+            void onResume() override;
             void onRunning() override;
             void onRunningBG() override;
         };
